@@ -2,9 +2,9 @@ import { ethers } from "ethers"
 
 // Contract addresses
 export const CONTRACT_ADDRESSES = {
-    FLUORITE_TOKEN: "0x3c0EDC63b641C52b89092978E2E945B65321D73C",
-    KINGDOM_NFT: "0xFE47b9052A4D83c9B597a976ca650AB00DF210Bc",
-    GAME_CONTROLLER: "0x1bdF540431F1b715Bf5f5a393E6b9d4F1d42B9A3",
+    FLUORITE_TOKEN: "0xCe95F6042F0859c046Ab0CdF9aEf69237b096300",
+    KINGDOM_NFT: "0x096991aCB60160EF7B2344F9739Cd80d87AD5cEc",
+    GAME_CONTROLLER: "0x3A2CBB7F0A7Cfa7C16F8b15bCfFa5c7C0864375E",
 }
 
 // Contract ABIs
@@ -69,7 +69,7 @@ export const getProvider = () => {
 
 // Helper functions
 export const getReadProvider = () => {
-    return new ethers.JsonRpcProvider("https://rpc.sepolia-api.lisk.com")
+    return new ethers.JsonRpcProvider("https://sepolia.base.org")
 }
 
 export const getSigner = async () => {

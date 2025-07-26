@@ -24,7 +24,7 @@ export async function GET(request, { params }) {
 
         // Check if player is authorized to access this level
         try {
-            const provider = new ethers.JsonRpcProvider("https://rpc.sepolia-api.lisk.com")
+            const provider = new ethers.JsonRpcProvider("https://sepolia.base.org")
             const gameController = new ethers.Contract(CONTRACT_ADDRESSES.GAME_CONTROLLER, GAME_CONTROLLER_ABI, provider)
 
             const playerInfo = await gameController.getPlayerInfo(playerAddress)

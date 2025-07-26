@@ -5,17 +5,17 @@ import { getContracts, getReadOnlyContracts, getSigner, getReadProvider } from "
 
 const WalletContext = createContext()
 
-// Lisk Sepolia Network Configuration
-const LISK_SEPOLIA = {
-  chainId: "0x106a", // 4202 in hex
-  chainName: "Lisk Sepolia Testnet",
+// Base Sepolia Network Configuration
+const BASE_SEPOLIA = {
+  chainId: "0x14a34", // 84532 in hex
+  chainName: "Base Sepolia Testnet",
   nativeCurrency: {
     name: "Sepolia Ether",
     symbol: "ETH",
     decimals: 18,
   },
-  rpcUrls: ["https://rpc.sepolia-api.lisk.com"],
-  blockExplorerUrls: ["https://sepolia-blockscout.lisk.com"],
+  rpcUrls: ["https://rpc.sepolia-api.base.org"],
+  blockExplorerUrls: ["https://base-sepolia.blockscout.com"],
 }
 
 export function WalletProvider({ children }) {
@@ -113,11 +113,11 @@ export function WalletProvider({ children }) {
     }
   }
 
-  const addLiskSepoliaNetwork = async () => {
+  const addBaseSepoliaNetwork = async () => {
     try {
       await window.ethereum.request({
         method: "wallet_addEthereumChain",
-        params: [LISK_SEPOLIA],
+        params: [BASE_SEPOLIA],
       })
       return true
     } catch (error) {
@@ -126,16 +126,16 @@ export function WalletProvider({ children }) {
     }
   }
 
-  const switchToLiskSepolia = async () => {
+  const switchToBaseSepolia = async () => {
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: LISK_SEPOLIA.chainId }],
+        params: [{ chainId: BASE_SEPOLIA.chainId }],
       })
       return true
     } catch (error) {
       if (error.code === 4902) {
-        return await addLiskSepoliaNetwork()
+        return await addBaseSepoliaNetwork()
       }
       console.error("Error switching network:", error)
       return false
@@ -156,14 +156,14 @@ export function WalletProvider({ children }) {
       })
 
       if (accounts.length > 0) {
-        const networkSwitched = await switchToLiskSepolia()
+        const networkSwitched = await switchToBaseSepolia()
 
         if (networkSwitched) {
           setWalletAddress(accounts[0])
           setIsConnected(true)
           await initializeContracts()
         } else {
-          alert("Please switch to Lisk Sepolia network to continue")
+          alert("Please switch to Base Sepolia network to continue")
         }
       }
     } catch (error) {

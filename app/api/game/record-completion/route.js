@@ -46,7 +46,7 @@ export async function POST(request) {
         // Try to record completion on blockchain
         try {
             // Initialize provider and signer for backend
-            const provider = new ethers.JsonRpcProvider("https://rpc.sepolia-api.lisk.com")
+            const provider = new ethers.JsonRpcProvider("https://sepolia.base.org")
             const signer = new ethers.Wallet(BACKEND_PRIVATE_KEY, provider)
 
             // Create contract instance

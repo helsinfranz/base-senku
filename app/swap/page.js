@@ -71,7 +71,7 @@ export default function SwapPage() {
             const data = await response.json()
 
             if (data.success) {
-                toast.success(`Successfully swapped ${swapAmount} tokens for ${swapAmount} FLUOR!`)
+                toast.success(`Successfully swapped ${swapAmount} MDS for ${swapAmount} FLUOR!`)
                 setSwapAmount("")
                 setTxHash("")
                 await loadPlayerData(true) // Refresh balance
@@ -122,11 +122,19 @@ export default function SwapPage() {
 
                     <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50">
                         <CardContent className="p-6 md:p-8">
+                            {/* Current MDS Balance */}
+                            <div className="bg-gray-800/50 rounded-lg p-4 mb-6">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-400">Current MDS Balance:</span>
+                                    <span className="text-blue-400 font-bold text-xl">100 MDS</span>
+                                </div>
+                            </div>
+
                             {/* Current FLUOR Balance */}
                             <div className="bg-gray-800/50 rounded-lg p-4 mb-6">
                                 <div className="flex items-center justify-between">
                                     <span className="text-gray-400">Current FLUOR Balance:</span>
-                                    <span className="text-blue-400 font-bold text-xl">{fluorBalance.toFixed(2)} FLUOR</span>
+                                    <span className="text-blue-400 font-bold text-xl">{fluorBalance} FLUOR</span>
                                 </div>
                             </div>
 
@@ -154,10 +162,10 @@ export default function SwapPage() {
                                         />
                                         <div className="flex items-center space-x-2 bg-gray-700/50 rounded-lg px-3 py-2">
                                             <Wallet className="w-5 h-5 text-gray-400" />
-                                            <span className="text-white font-semibold">UTILITY</span>
+                                            <span className="text-white font-semibold">MDS</span>
                                         </div>
                                     </div>
-                                    <div className="text-gray-500 text-sm mt-2">Balance: 100.00 UTILITY</div>
+                                    <div className="text-gray-500 text-sm mt-2">Balance: 100.00 MDS</div>
                                 </div>
 
                                 {/* Swap Arrow */}
@@ -185,7 +193,7 @@ export default function SwapPage() {
                                             <span className="text-white font-semibold">FLUOR</span>
                                         </div>
                                     </div>
-                                    <div className="text-gray-500 text-sm mt-2">1 UTILITY = 1 FLUOR</div>
+                                    <div className="text-gray-500 text-sm mt-2">1 MDS = 1 FLUOR</div>
                                 </div>
                             </div>
 
@@ -196,11 +204,11 @@ export default function SwapPage() {
                                     <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
                                             <span className="text-gray-400">Exchange Rate:</span>
-                                            <span className="text-white">1 UTILITY = 1 FLUOR</span>
+                                            <span className="text-white">1 MDS = 1 FLUOR</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-gray-400">You Pay:</span>
-                                            <span className="text-white">{swapAmount} UTILITY</span>
+                                            <span className="text-white">{swapAmount} MDS</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-gray-400">You Receive:</span>
@@ -235,8 +243,8 @@ export default function SwapPage() {
                                 onClick={handleSwap}
                                 disabled={!swapAmount || Number.parseFloat(swapAmount) <= 0 || isSwapping || isProcessing}
                                 className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${!swapAmount || Number.parseFloat(swapAmount) <= 0 || isSwapping || isProcessing
-                                        ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
-                                        : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"
+                                    ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+                                    : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"
                                     }`}
                             >
                                 {isSwapping ? "Confirming Transaction..." : isProcessing ? "Processing Swap..." : "Swap Tokens"}
@@ -246,9 +254,9 @@ export default function SwapPage() {
                             <div className="mt-6 p-4 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
                                 <h4 className="text-yellow-400 font-semibold mb-2">How it works:</h4>
                                 <ul className="text-gray-300 text-sm space-y-1">
-                                    <li>• Send your utility tokens to our smart contract</li>
+                                    <li>• Send your MDS tokens to our address</li>
                                     <li>• We verify the transaction on the blockchain</li>
-                                    <li>• Receive the same amount in FLUOR tokens</li>
+                                    <li>• User receives the same amount in FLUOR tokens</li>
                                     <li>• Use FLUOR to play levels and unlock NFTs</li>
                                 </ul>
                             </div>

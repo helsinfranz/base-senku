@@ -144,7 +144,10 @@ export function WalletProvider({ children }) {
 
   const connectWallet = async () => {
     if (!window.ethereum) {
-      alert("Please install MetaMask or another Web3 wallet!")
+      // Use toast instead of alert
+      if (typeof window !== "undefined" && window.toast) {
+        window.toast.error("Please install MetaMask or another Web3 wallet!")
+      }
       return
     }
 
@@ -163,12 +166,16 @@ export function WalletProvider({ children }) {
           setIsConnected(true)
           await initializeContracts()
         } else {
-          alert("Please switch to Base Sepolia network to continue")
+          if (typeof window !== "undefined" && window.toast) {
+            window.toast.error("Please switch to Base Sepolia network to continue")
+          }
         }
       }
     } catch (error) {
       console.error("Error connecting wallet:", error)
-      alert("Failed to connect wallet. Please try again.")
+      if (typeof window !== "undefined" && window.toast) {
+        window.toast.error("Failed to connect wallet. Please try again.")
+      }
     } finally {
       setIsConnecting(false)
     }
@@ -189,7 +196,7 @@ export function WalletProvider({ children }) {
     setReadOnlyContracts(null)
   }
 
-  // Contract interaction functions
+  // Contract interaction functions with toast notifications
   const claimInitialTokens = async () => {
     if (!contracts || !walletAddress || !readOnlyContracts) {
       console.error("Contracts not initialized")
@@ -225,11 +232,15 @@ export function WalletProvider({ children }) {
           ...prev,
           hasClaimedInitialTokens: true,
         }))
-        alert("You have already claimed your initial tokens!")
+        if (typeof window !== "undefined" && window.toast) {
+          window.toast.warning("You have already claimed your initial tokens!")
+        }
         return true // Return true to close the modal
       }
 
-      alert("Failed to claim initial tokens. Please try again.")
+      if (typeof window !== "undefined" && window.toast) {
+        window.toast.error("Failed to claim initial tokens. Please try again.")
+      }
       return false
     } finally {
       setIsLoading(false)
@@ -249,7 +260,9 @@ export function WalletProvider({ children }) {
       return true
     } catch (error) {
       console.error("Error paying to play:", error)
-      alert("Failed to start level. Please try again.")
+      if (typeof window !== "undefined" && window.toast) {
+        window.toast.error("Failed to start level. Please try again.")
+      }
       return false
     } finally {
       setIsLoading(false)
@@ -267,7 +280,9 @@ export function WalletProvider({ children }) {
       return true
     } catch (error) {
       console.error("Error claiming reward:", error)
-      alert("Failed to claim reward. Please try again.")
+      if (typeof window !== "undefined" && window.toast) {
+        window.toast.error("Failed to claim reward. Please try again.")
+      }
       return false
     } finally {
       setIsLoading(false)
@@ -285,7 +300,9 @@ export function WalletProvider({ children }) {
       return true
     } catch (error) {
       console.error("Error unlocking NFT:", error)
-      alert("Failed to unlock NFT. Please try again.")
+      if (typeof window !== "undefined" && window.toast) {
+        window.toast.error("Failed to unlock NFT. Please try again.")
+      }
       return false
     } finally {
       setIsLoading(false)

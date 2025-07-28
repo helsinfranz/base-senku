@@ -5,10 +5,10 @@ import Header from "@/components/header"
 import ParticleBackground from "@/components/particle-background"
 import GameBoard from "@/components/game-board"
 import GameControls from "@/components/game-controls"
-// import LevelCompleteModal from "@/components/level-complete-modal"
 import InitialTokensModal from "@/components/initial-tokens-modal"
 import RouteGuard from "@/components/route-guard"
 import { useWallet } from "@/contexts/wallet-context"
+import { useToast } from "@/components/toast"
 
 function GameArenaContent() {
   const {
@@ -23,6 +23,7 @@ function GameArenaContent() {
     loadPlayerData,
     walletAddress,
   } = useWallet()
+  const toast = useToast()
 
   const [gameState, setGameState] = useState({
     showLevelComplete: false,
@@ -94,7 +95,7 @@ function GameArenaContent() {
       } else {
         console.error("Failed to load level:", data.error)
         if (data.error === "Unauthorized access to this level") {
-          alert("You don't have access to this level. Please complete previous levels first.")
+          toast.error("You don't have access to this level. Please complete previous levels first.")
           // Redirect to appropriate level
           await loadPlayerData(true) // Force refresh
           return
@@ -117,6 +118,7 @@ function GameArenaContent() {
       }
     } catch (error) {
       console.error("Error loading level:", error)
+      toast.error("Failed to load level. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -140,6 +142,7 @@ function GameArenaContent() {
       const data = await response.json()
 
       if (data.success && data.isCompleted) {
+        toast.success("Level completed successfully! Recorded on blockchain.")
         setGameState((prev) => ({
           ...prev,
           showLevelComplete: true,
@@ -148,15 +151,15 @@ function GameArenaContent() {
         await loadPlayerData(true)
       } else if (data.isCompleted && !data.success) {
         // Solution is correct but blockchain failed - don't allow progression
-        alert(
-          `Your solution is correct, but we couldn't record it on the blockchain. Please try submitting again to proceed to the next level.`,
+        toast.error(
+          "Your solution is correct, but we couldn't record it on the blockchain. Please try submitting again to proceed to the next level.",
         )
       } else {
-        alert(data.message || "Level not complete yet! Keep sorting the liquids.")
+        toast.warning(data.message || "Level not complete yet! Keep sorting the liquids.")
       }
     } catch (error) {
       console.error("Error checking completion:", error)
-      alert("Error checking completion. Please try again.")
+      toast.error("Error checking completion. Please try again.")
     } finally {
       setIsCheckingCompletion(false)
     }
@@ -167,6 +170,7 @@ function GameArenaContent() {
     if (success) {
       // Explicitly hide the modal and reload player data
       setGameState((prev) => ({ ...prev, showInitialTokens: false }))
+      toast.success("Successfully claimed 5 FLUOR tokens!")
       // After claiming tokens, determine the current level
       setTimeout(() => {
         determineCurrentLevel()
@@ -177,6 +181,7 @@ function GameArenaContent() {
   const handlePayToPlay = async () => {
     const success = await payToPlay()
     if (success) {
+      toast.success("Payment successful! Level unlocked.")
       setGameState((prev) => ({
         ...prev,
         showLevelComplete: false,
@@ -191,6 +196,7 @@ function GameArenaContent() {
     setGameState((prev) => ({ ...prev, isClaimingReward: true }))
     const success = await claimReward()
     if (success) {
+      toast.success("Rewards claimed successfully!")
       // After claiming rewards, check if user can now afford to play
       setTimeout(() => {
         determineCurrentLevel()
@@ -232,7 +238,7 @@ function GameArenaContent() {
   const handleUnlockNft = async () => {
     const safety = calculateNftMintingSafety()
     if (!safety.canMint) {
-      alert(`Cannot mint NFT: ${safety.reason}`)
+      toast.error(`Cannot mint NFT: ${safety.reason}`)
       return
     }
 
@@ -241,7 +247,10 @@ function GameArenaContent() {
         `Are you sure you want to spend 10 FLUOR to mint an NFT? You'll have ${(fluorBalance - 10).toFixed(2)} FLUOR remaining.`,
       )
     ) {
-      await unlockNft()
+      const success = await unlockNft()
+      if (success) {
+        toast.success("NFT minted successfully!")
+      }
     }
   }
 
@@ -297,6 +306,7 @@ function GameArenaContent() {
     setGameState((prev) => ({ ...prev, isPayingToPlay: true }))
     const success = await payToPlay()
     if (success) {
+      toast.success("Payment successful! Level unlocked.")
       setGameState((prev) => ({
         ...prev,
         needsPayment: false,
@@ -463,10 +473,6 @@ function GameArenaContent() {
           />
         </div>
       </main>
-
-      {/* {gameState.showLevelComplete && (
-        <LevelCompleteModal onNextLevel={handlePayToPlay} canAfford={fluorBalance >= 1} isLoading={walletLoading} />
-      )} */}
     </div>
   )
 }

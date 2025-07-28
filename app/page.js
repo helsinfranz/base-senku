@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import Header from "@/components/header"
 import ParticleBackground from "@/components/particle-background"
+import PoweredBySection from "@/components/powered-by-section"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
@@ -151,6 +152,13 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Powered By Section */}
+          <Card className="bg-gray-900/40 backdrop-blur-md border border-gray-700/30 mb-12 md:mb-16">
+            <CardContent className="p-6 md:p-8">
+              <PoweredBySection />
+            </CardContent>
+          </Card>
 
           {/* Game Guide Section */}
           <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50">

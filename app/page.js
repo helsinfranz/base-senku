@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import { useWallet } from "@/contexts/wallet-context"
-import { Atom, Beaker, Trophy, Zap, Gem, TrendingUp, Gift } from "lucide-react"
+import { Atom, Beaker, Trophy, Zap, Gem, TrendingUp, Gift, ArrowRightLeft, AlertTriangle } from "lucide-react"
 import Image from "next/image"
 
 export default function HomePage() {
@@ -153,6 +153,42 @@ export default function HomePage() {
             </Card>
           </div>
 
+          {/* Token Swap Feature Highlight */}
+          <Card className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 backdrop-blur-md border border-purple-500/50 mb-12 md:mb-16">
+            <CardContent className="p-6 md:p-8">
+              <div className="flex flex-col md:flex-row items-center justify-between">
+                <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                  <div className="bg-purple-500/20 rounded-full p-3">
+                    <ArrowRightLeft className="w-8 h-8 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2">MDS to FLUOR Swap</h3>
+                    <p className="text-gray-300 text-sm md:text-base">
+                      Convert your Medusa Shards (MDS) tokens to FLUOR at a 1:1 ratio
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center md:items-end space-y-2">
+                  <div className="bg-yellow-900/20 rounded-lg px-3 py-1 border border-yellow-500/30">
+                    <div className="flex items-center space-x-2">
+                      <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                      <span className="text-yellow-400 text-sm font-semibold">One-Way Swap</span>
+                    </div>
+                  </div>
+                  {isConnected ? (
+                    <Link href="/swap">
+                      <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300">
+                        Swap Tokens
+                      </Button>
+                    </Link>
+                  ) : (
+                    <p className="text-gray-400 text-sm">Connect wallet to swap</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Powered By Section */}
           <Card className="bg-gray-900/40 backdrop-blur-md border border-gray-700/30 mb-12 md:mb-16">
             <CardContent className="p-6 md:p-8">
@@ -295,6 +331,14 @@ export default function HomePage() {
                           <h4 className="text-purple-400 font-semibold text-sm">Mint NFTs</h4>
                         </div>
                         <p className="text-xs text-gray-300">Collect rare scientific blueprint NFTs</p>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-indigo-900/20 to-purple-800/20 rounded-lg p-3 border border-indigo-500/30">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <div className="text-lg">🔄</div>
+                          <h4 className="text-indigo-400 font-semibold text-sm">Token Swap</h4>
+                        </div>
+                        <p className="text-xs text-gray-300">Convert MDS tokens to FLUOR for gameplay</p>
                       </div>
                     </div>
                   </div>

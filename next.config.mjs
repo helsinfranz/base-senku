@@ -6,6 +6,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    domains: ['www.dcodeblock.com'],
+  },
 }
 
 export default nextConfig
+

@@ -6,12 +6,17 @@ import Header from "@/components/header"
 import ParticleBackground from "@/components/particle-background"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowDownUp, Wallet, ExternalLink, RefreshCw } from "lucide-react"
+import { ArrowDownUp, ExternalLink, RefreshCw, AlertTriangle } from "lucide-react"
 import { useWallet } from "@/contexts/wallet-context"
 import { useToast } from "@/components/toast"
+import { ethers } from "ethers"
+import Image from "next/image"
+
+// MDS Token Contract Address (Base Sepolia)
+const MDS_TOKEN_ADDRESS = "0x1234567890123456789012345678901234567890" // Replace with actual MDS token address
 
 export default function SwapPage() {
-    const { isConnected, walletAddress, fluorBalance, loadPlayerData } = useWallet()
+    const { isConnected, walletAddress, fluorBalance, loadPlayerData, contracts } = useWallet()
     const router = useRouter()
     const toast = useToast()
 
@@ -19,6 +24,8 @@ export default function SwapPage() {
     const [isSwapping, setIsSwapping] = useState(false)
     const [txHash, setTxHash] = useState("")
     const [isProcessing, setIsProcessing] = useState(false)
+    const [mdsBalance, setMdsBalance] = useState(0)
+    const [isLoadingBalance, setIsLoadingBalance] = useState(false)
 
     // Redirect if not connected
     useEffect(() => {
@@ -27,44 +34,91 @@ export default function SwapPage() {
         }
     }, [isConnected, router])
 
+    // Load MDS balance
+    useEffect(() => {
+        if (isConnected && walletAddress) {
+            loadMdsBalance()
+        }
+    }, [isConnected, walletAddress])
+
+    const loadMdsBalance = async () => {
+        if (!walletAddress) return
+
+        setIsLoadingBalance(true)
+        try {
+            const provider = new ethers.JsonRpcProvider("https://sepolia.base.org")
+            const mdsContract = new ethers.Contract(
+                MDS_TOKEN_ADDRESS,
+                ["function balanceOf(address owner) view returns (uint256)"],
+                provider,
+            )
+
+            const balance = await mdsContract.balanceOf(walletAddress)
+            const balanceFormatted = Number(ethers.formatEther(balance))
+            setMdsBalance(balanceFormatted)
+        } catch (error) {
+            console.error("Error loading MDS balance:", error)
+            // Mock balance for demo
+            setMdsBalance(100)
+        } finally {
+            setIsLoadingBalance(false)
+        }
+    }
+
     const handleSwap = async () => {
         if (!swapAmount || Number.parseFloat(swapAmount) <= 0) {
             toast.error("Please enter a valid amount to swap")
             return
         }
 
-        if (!walletAddress) {
-            toast.error("Wallet not connected")
+        if (Number.parseFloat(swapAmount) > mdsBalance) {
+            toast.error("Insufficient MDS balance")
+            return
+        }
+
+        if (!walletAddress || !contracts) {
+            toast.error("Wallet not connected or contracts not initialized")
             return
         }
 
         setIsSwapping(true)
 
         try {
-            // Here you would implement the actual token payment logic
-            // For now, we'll simulate the process
-            toast.info("Please confirm the transaction in your wallet...")
+            toast.info("Please approve the MDS token transfer in your wallet...")
 
-            // Simulate transaction
-            await new Promise((resolve) => setTimeout(resolve, 2000))
+            // First, approve the MDS token transfer
+            const mdsContract = new ethers.Contract(
+                MDS_TOKEN_ADDRESS,
+                [
+                    "function approve(address spender, uint256 amount) returns (bool)",
+                    "function transfer(address to, uint256 amount) returns (bool)",
+                ],
+                contracts.gameController.runner, // Use the signer from contracts
+            )
 
-            // Mock transaction hash - in real implementation, this would come from the actual transaction
-            const mockTxHash = "0x" + Math.random().toString(16).substr(2, 64)
-            setTxHash(mockTxHash)
+            // For demo purposes, we'll simulate sending MDS to a backend address
+            const backendAddress = "0x742d35Cc6634C0532925a3b8D0C9C0E0C0C0C0C0" // Replace with actual backend address
+            const amountWei = ethers.parseEther(swapAmount)
 
-            toast.success("Transaction submitted! Processing swap...")
+            // Send MDS tokens to backend
+            const tx = await mdsContract.transfer(backendAddress, amountWei)
+            setTxHash(tx.hash)
+
+            toast.success("MDS transfer submitted! Processing swap...")
             setIsProcessing(true)
 
-            // Send transaction details to backend for verification and FLUOR minting
+            // Wait for transaction confirmation
+            const receipt = await tx.wait()
+
+            // Send transaction details to backend for verification and FLUOR transfer
             const response = await fetch("/api/swap/process", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    walletAddress,
+                    txHash: tx.hash,
                     amount: swapAmount,
-                    txHash: mockTxHash,
                 }),
             })
 
@@ -74,13 +128,18 @@ export default function SwapPage() {
                 toast.success(`Successfully swapped ${swapAmount} MDS for ${swapAmount} FLUOR!`)
                 setSwapAmount("")
                 setTxHash("")
-                await loadPlayerData(true) // Refresh balance
+                await loadPlayerData(true) // Refresh FLUOR balance
+                await loadMdsBalance() // Refresh MDS balance
             } else {
-                toast.error(data.message || "Swap failed. Please try again.")
+                toast.error(data.message || "Swap failed. Please contact support.")
             }
         } catch (error) {
             console.error("Swap error:", error)
-            toast.error("Swap failed. Please try again.")
+            if (error.code === 4001) {
+                toast.warning("Transaction cancelled by user")
+            } else {
+                toast.error("Swap failed. Please try again.")
+            }
         } finally {
             setIsSwapping(false)
             setIsProcessing(false)
@@ -88,9 +147,7 @@ export default function SwapPage() {
     }
 
     const handleMaxClick = () => {
-        // In a real implementation, you'd get the user's actual token balance
-        // For now, we'll use a mock balance
-        setSwapAmount("100")
+        setSwapAmount(mdsBalance.toString())
     }
 
     if (!isConnected) {
@@ -117,36 +174,53 @@ export default function SwapPage() {
                 <div className="max-w-2xl mx-auto">
                     <div className="text-center mb-8">
                         <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Token Swap</h1>
-                        <p className="text-gray-400 text-lg">Convert your utility tokens to FLUOR</p>
+                        <p className="text-gray-400 text-lg">Convert your Medusa Shards (MDS) to FLUOR</p>
                     </div>
 
                     <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50">
                         <CardContent className="p-6 md:p-8">
-                            {/* Current MDS Balance */}
-                            <div className="bg-gray-800/50 rounded-lg p-4 mb-6">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-400">Current MDS Balance:</span>
-                                    <span className="text-blue-400 font-bold text-xl">100 MDS</span>
+                            {/* One-way swap notice */}
+                            <div className="bg-yellow-900/20 rounded-lg p-4 mb-6 border border-yellow-500/30">
+                                <div className="flex items-start space-x-3">
+                                    <AlertTriangle className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <h4 className="text-yellow-400 font-semibold mb-1">One-Way Swap Notice</h4>
+                                        <p className="text-gray-300 text-sm">
+                                            This is a one-way swap from MDS to FLUOR. Once converted, FLUOR cannot be swapped back to MDS.
+                                            Please ensure you want to proceed with this conversion.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Current FLUOR Balance */}
-                            <div className="bg-gray-800/50 rounded-lg p-4 mb-6">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-400">Current FLUOR Balance:</span>
-                                    <span className="text-blue-400 font-bold text-xl">{fluorBalance} FLUOR</span>
+                            {/* Current Balances */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div className="bg-gray-800/50 rounded-lg p-4">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-gray-400">MDS Balance:</span>
+                                        <span className="text-blue-400 font-bold text-xl">
+                                            {isLoadingBalance ? "..." : `${mdsBalance.toFixed(2)} MDS`}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="bg-gray-800/50 rounded-lg p-4">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-gray-400">FLUOR Balance:</span>
+                                        <span className="text-green-400 font-bold text-xl">{fluorBalance.toFixed(2)} FLUOR</span>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Swap Interface */}
                             <div className="space-y-4">
-                                {/* From Token */}
+                                {/* From Token - MDS */}
                                 <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-600/30">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-gray-400 text-sm">From</span>
                                         <button
                                             onClick={handleMaxClick}
                                             className="text-green-400 text-sm hover:text-green-300 transition-colors"
+                                            disabled={isSwapping || isProcessing}
                                         >
                                             MAX
                                         </button>
@@ -159,13 +233,18 @@ export default function SwapPage() {
                                             placeholder="0.0"
                                             className="flex-1 bg-transparent text-white text-2xl font-bold outline-none placeholder-gray-500"
                                             disabled={isSwapping || isProcessing}
+                                            max={mdsBalance}
                                         />
-                                        <div className="flex items-center space-x-2 bg-gray-700/50 rounded-lg px-3 py-2">
-                                            <Wallet className="w-5 h-5 text-gray-400" />
+                                        <div className="flex items-center space-x-2 bg-purple-700/50 rounded-lg px-3 py-2">
+                                            <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                                                <span className="text-white text-xs font-bold">M</span>
+                                            </div>
                                             <span className="text-white font-semibold">MDS</span>
                                         </div>
                                     </div>
-                                    <div className="text-gray-500 text-sm mt-2">Balance: 100.00 MDS</div>
+                                    <div className="text-gray-500 text-sm mt-2">
+                                        Balance: {isLoadingBalance ? "Loading..." : `${mdsBalance.toFixed(2)} MDS`}
+                                    </div>
                                 </div>
 
                                 {/* Swap Arrow */}
@@ -175,7 +254,7 @@ export default function SwapPage() {
                                     </div>
                                 </div>
 
-                                {/* To Token */}
+                                {/* To Token - FLUOR */}
                                 <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-600/30">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-gray-400 text-sm">To</span>
@@ -189,7 +268,15 @@ export default function SwapPage() {
                                             disabled
                                         />
                                         <div className="flex items-center space-x-2 bg-blue-700/50 rounded-lg px-3 py-2">
-                                            <div className="w-5 h-5 bg-blue-400 rounded-full"></div>
+                                            <div className="relative w-6 h-6">
+                                                <Image
+                                                    src="/android-chrome-192x192.png"
+                                                    alt="FLUOR"
+                                                    width={24}
+                                                    height={24}
+                                                    className="rounded-full"
+                                                />
+                                            </div>
                                             <span className="text-white font-semibold">FLUOR</span>
                                         </div>
                                     </div>
@@ -214,6 +301,10 @@ export default function SwapPage() {
                                             <span className="text-gray-400">You Receive:</span>
                                             <span className="text-green-400 font-semibold">{swapAmount} FLUOR</span>
                                         </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Network Fee:</span>
+                                            <span className="text-gray-400">~$0.01 (Gas)</span>
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -230,9 +321,14 @@ export default function SwapPage() {
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             {isProcessing && <RefreshCw className="w-4 h-4 text-blue-400 animate-spin" />}
-                                            <button className="text-blue-400 hover:text-blue-300 transition-colors">
+                                            <a
+                                                href={`https://base-sepolia.blockscout.com/tx/${txHash}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-400 hover:text-blue-300 transition-colors"
+                                            >
                                                 <ExternalLink className="w-4 h-4" />
-                                            </button>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -241,23 +337,33 @@ export default function SwapPage() {
                             {/* Swap Button */}
                             <Button
                                 onClick={handleSwap}
-                                disabled={!swapAmount || Number.parseFloat(swapAmount) <= 0 || isSwapping || isProcessing}
-                                className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${!swapAmount || Number.parseFloat(swapAmount) <= 0 || isSwapping || isProcessing
-                                    ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
-                                    : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"
+                                disabled={
+                                    !swapAmount ||
+                                    Number.parseFloat(swapAmount) <= 0 ||
+                                    Number.parseFloat(swapAmount) > mdsBalance ||
+                                    isSwapping ||
+                                    isProcessing
+                                }
+                                className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${!swapAmount ||
+                                        Number.parseFloat(swapAmount) <= 0 ||
+                                        Number.parseFloat(swapAmount) > mdsBalance ||
+                                        isSwapping ||
+                                        isProcessing
+                                        ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+                                        : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"
                                     }`}
                             >
                                 {isSwapping ? "Confirming Transaction..." : isProcessing ? "Processing Swap..." : "Swap Tokens"}
                             </Button>
 
                             {/* Info Section */}
-                            <div className="mt-6 p-4 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
-                                <h4 className="text-yellow-400 font-semibold mb-2">How it works:</h4>
+                            <div className="mt-6 p-4 bg-blue-900/20 rounded-lg border border-blue-500/30">
+                                <h4 className="text-blue-400 font-semibold mb-2">How it works:</h4>
                                 <ul className="text-gray-300 text-sm space-y-1">
-                                    <li>• Send your MDS tokens to our address</li>
-                                    <li>• We verify the transaction on the blockchain</li>
-                                    <li>• User receives the same amount in FLUOR tokens</li>
-                                    <li>• Use FLUOR to play levels and unlock NFTs</li>
+                                    <li>• Send your MDS tokens to our secure address</li>
+                                    <li>• We verify the transaction on Base Sepolia blockchain</li>
+                                    <li>• Receive the same amount in FLUOR tokens instantly</li>
+                                    <li>• Use FLUOR to play levels and unlock NFTs in the game</li>
                                 </ul>
                             </div>
                         </CardContent>

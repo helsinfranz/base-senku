@@ -142,173 +142,6 @@ export function WalletProvider({ children }) {
     }
   }
 
-  const connectWallet = async () => {
-    if (!window.ethereum) {
-      // Use toast instead of alert
-      if (typeof window !== "undefined" && window.toast) {
-        window.toast.error("Please install MetaMask or another Web3 wallet!")
-      }
-      return
-    }
-
-    setIsConnecting(true)
-
-    try {
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      })
-
-      if (accounts.length > 0) {
-        const networkSwitched = await switchToBaseSepolia()
-
-        if (networkSwitched) {
-          setWalletAddress(accounts[0])
-          setIsConnected(true)
-          await initializeContracts()
-        } else {
-          if (typeof window !== "undefined" && window.toast) {
-            window.toast.error("Please switch to Base Sepolia network to continue")
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error connecting wallet:", error)
-      if (typeof window !== "undefined" && window.toast) {
-        window.toast.error("Failed to connect wallet. Please try again.")
-      }
-    } finally {
-      setIsConnecting(false)
-    }
-  }
-
-  const disconnectWallet = () => {
-    setIsConnected(false)
-    setWalletAddress("")
-    setFluorBalance(0)
-    setNftCount(0)
-    setPlayerData({
-      currentLevel: 0,
-      levelsCompleted: 0,
-      claimableRewardSets: 0,
-      hasClaimedInitialTokens: false,
-    })
-    setContracts(null)
-    setReadOnlyContracts(null)
-  }
-
-  // Contract interaction functions with toast notifications
-  const claimInitialTokens = async () => {
-    if (!contracts || !walletAddress || !readOnlyContracts) {
-      console.error("Contracts not initialized")
-      return false
-    }
-
-    try {
-      setIsLoading(true)
-      console.log("Claiming initial tokens...")
-
-      const tx = await contracts.gameController.claimInitialTokens()
-      console.log("Transaction sent:", tx.hash)
-
-      const receipt = await tx.wait()
-      console.log("Transaction confirmed:", receipt)
-
-      // Update player data immediately to reflect the change
-      setPlayerData((prev) => ({
-        ...prev,
-        hasClaimedInitialTokens: true,
-      }))
-
-      // Reload all player data from blockchain with force refresh
-      await loadPlayerData(true)
-
-      return true
-    } catch (error) {
-      console.error("Error claiming initial tokens:", error)
-
-      // Check if it's because they already claimed
-      if (error.message && error.message.includes("Already claimed")) {
-        setPlayerData((prev) => ({
-          ...prev,
-          hasClaimedInitialTokens: true,
-        }))
-        if (typeof window !== "undefined" && window.toast) {
-          window.toast.warning("You have already claimed your initial tokens!")
-        }
-        return true // Return true to close the modal
-      }
-
-      if (typeof window !== "undefined" && window.toast) {
-        window.toast.error("Failed to claim initial tokens. Please try again.")
-      }
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const payToPlay = async () => {
-    if (!contracts || !walletAddress || !readOnlyContracts) return false
-
-    try {
-      setIsLoading(true)
-
-      // Then pay to play
-      const tx = await contracts.gameController.payToPlay()
-      await tx.wait()
-      await loadPlayerData(true) // Force refresh after payment
-      return true
-    } catch (error) {
-      console.error("Error paying to play:", error)
-      if (typeof window !== "undefined" && window.toast) {
-        window.toast.error("Failed to start level. Please try again.")
-      }
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const claimReward = async () => {
-    if (!contracts || !walletAddress || !readOnlyContracts) return false
-
-    try {
-      setIsLoading(true)
-      const tx = await contracts.gameController.claimReward()
-      await tx.wait()
-      await loadPlayerData(true) // Force refresh after claiming
-      return true
-    } catch (error) {
-      console.error("Error claiming reward:", error)
-      if (typeof window !== "undefined" && window.toast) {
-        window.toast.error("Failed to claim reward. Please try again.")
-      }
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const unlockNft = async () => {
-    if (!contracts || !readOnlyContracts || !walletAddress) return false
-
-    try {
-      setIsLoading(true)
-      const tx = await contracts.gameController.unlockNft()
-      await tx.wait()
-      await loadPlayerData(true) // Force refresh after NFT unlock
-      return true
-    } catch (error) {
-      console.error("Error unlocking NFT:", error)
-      if (typeof window !== "undefined" && window.toast) {
-        window.toast.error("Failed to unlock NFT. Please try again.")
-      }
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const value = {
     isConnected,
     walletAddress,
@@ -319,13 +152,142 @@ export function WalletProvider({ children }) {
     contracts,
     readOnlyContracts,
     isLoading,
-    connectWallet,
-    disconnectWallet,
     loadPlayerData,
-    claimInitialTokens,
-    payToPlay,
-    claimReward,
-    unlockNft,
+    connectWallet: async () => {
+      if (!window.ethereum) {
+        console.error("Please install MetaMask or another Web3 wallet!")
+        return
+      }
+
+      setIsConnecting(true)
+
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        })
+
+        if (accounts.length > 0) {
+          const networkSwitched = await switchToBaseSepolia()
+
+          if (networkSwitched) {
+            setWalletAddress(accounts[0])
+            setIsConnected(true)
+            await initializeContracts()
+          }
+        }
+      } catch (error) {
+        console.error("Error connecting wallet:", error)
+      } finally {
+        setIsConnecting(false)
+      }
+    },
+    disconnectWallet: () => {
+      setIsConnected(false)
+      setWalletAddress("")
+      setFluorBalance(0)
+      setNftCount(0)
+      setPlayerData({
+        currentLevel: 0,
+        levelsCompleted: 0,
+        claimableRewardSets: 0,
+        hasClaimedInitialTokens: false,
+      })
+      setContracts(null)
+      setReadOnlyContracts(null)
+    },
+    claimInitialTokens: async () => {
+      if (!contracts || !walletAddress || !readOnlyContracts) {
+        console.error("Contracts not initialized")
+        return false
+      }
+
+      try {
+        setIsLoading(true)
+        console.log("Claiming initial tokens...")
+
+        const tx = await contracts.gameController.claimInitialTokens()
+        console.log("Transaction sent:", tx.hash)
+
+        const receipt = await tx.wait()
+        console.log("Transaction confirmed:", receipt)
+
+        // Update player data immediately to reflect the change
+        setPlayerData((prev) => ({
+          ...prev,
+          hasClaimedInitialTokens: true,
+        }))
+
+        // Reload all player data from blockchain with force refresh
+        await loadPlayerData(true)
+
+        return true
+      } catch (error) {
+        console.error("Error claiming initial tokens:", error)
+
+        // Check if it's because they already claimed
+        if (error.message && error.message.includes("Already claimed")) {
+          setPlayerData((prev) => ({
+            ...prev,
+            hasClaimedInitialTokens: true,
+          }))
+          return true // Return true to close the modal
+        }
+
+        return false
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    payToPlay: async () => {
+      if (!contracts || !walletAddress || !readOnlyContracts) return false
+
+      try {
+        setIsLoading(true)
+
+        // Then pay to play
+        const tx = await contracts.gameController.payToPlay()
+        await tx.wait()
+        await loadPlayerData(true) // Force refresh after payment
+        return true
+      } catch (error) {
+        console.error("Error paying to play:", error)
+        return false
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    claimReward: async () => {
+      if (!contracts || !walletAddress || !readOnlyContracts) return false
+
+      try {
+        setIsLoading(true)
+        const tx = await contracts.gameController.claimReward()
+        await tx.wait()
+        await loadPlayerData(true) // Force refresh after claiming
+        return true
+      } catch (error) {
+        console.error("Error claiming reward:", error)
+        return false
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    unlockNft: async () => {
+      if (!contracts || !readOnlyContracts || !walletAddress) return false
+
+      try {
+        setIsLoading(true)
+        const tx = await contracts.gameController.unlockNft()
+        await tx.wait()
+        await loadPlayerData(true) // Force refresh after NFT unlock
+        return true
+      } catch (error) {
+        console.error("Error unlocking NFT:", error)
+        return false
+      } finally {
+        setIsLoading(false)
+      }
+    },
   }
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>

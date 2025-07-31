@@ -6,39 +6,27 @@ import Image from "next/image"
 // Array of partner/sponsor logo URLs - you can replace these with your actual URLs
 const PARTNER_LOGOS = [
     {
-        url: "https://www.dcodeblock.com/assets/dcb-logo-YdUy8tsw.png",
+        url: "/brands/dcb.jpg",
         name: "DcodeBlock",
         width: 140,
         height: 60,
     },
     {
-        url: "/placeholder.svg?height=60&width=120&text=Base",
+        url: "/brands/base.png",
         name: "Base",
-        width: 120,
+        width: 140,
         height: 60,
     },
     {
-        url: "/placeholder.svg?height=60&width=100&text=Virtuals",
+        url: "/brands/virtuals.png",
         name: "Virtuals",
-        width: 100,
+        width: 140,
         height: 60,
     },
     {
-        url: "/placeholder.svg?height=60&width=110&text=Partner4",
-        name: "Partner 4",
-        width: 110,
-        height: 60,
-    },
-    {
-        url: "/placeholder.svg?height=60&width=130&text=Partner5",
-        name: "Partner 5",
-        width: 130,
-        height: 60,
-    },
-    {
-        url: "/placeholder.svg?height=60&width=90&text=Partner6",
-        name: "Partner 6",
-        width: 90,
+        url: "/brands/mds.png",
+        name: "$MDS",
+        width: 140,
         height: 60,
     },
 ]
@@ -141,8 +129,8 @@ export default function PoweredBySection() {
                             key={index}
                             onClick={() => setCurrentIndex(index)}
                             className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex
-                                    ? "bg-gradient-to-r from-green-400 to-blue-400 scale-125"
-                                    : "bg-gray-600 hover:bg-gray-500"
+                                ? "bg-gradient-to-r from-green-400 to-blue-400 scale-125"
+                                : "bg-gray-600 hover:bg-gray-500"
                                 }`}
                         />
                     ))}

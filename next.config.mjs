@@ -7,7 +7,12 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['www.dcodeblock.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'www.dcodeblock.com',
+      },
+    ],
   },
 }
 

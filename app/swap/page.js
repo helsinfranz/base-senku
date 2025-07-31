@@ -361,7 +361,7 @@ export default function SwapPage() {
                                 <h4 className="text-blue-400 font-semibold mb-2">How it works:</h4>
                                 <ul className="text-gray-300 text-sm space-y-1">
                                     <li>• Send your MDS tokens to our secure address</li>
-                                    <li>• We verify the transaction on Base Sepolia blockchain</li>
+                                    <li>• We verify the transaction on Base blockchain</li>
                                     <li>• Receive the same amount in FLUOR tokens instantly</li>
                                     <li>• Use FLUOR to play levels and unlock NFTs in the game</li>
                                 </ul>

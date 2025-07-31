@@ -50,7 +50,7 @@ export default function PoweredBySection() {
     }
 
     return (
-        <div className="w-full py-8 md:py-12">
+        <div className="w-full py-8 md:py-1">
             <div className="text-center mb-8 md:mb-10">
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-3">Ecosystem Partners</h3>
                 <div className="w-20 h-1 bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 mx-auto rounded-full"></div>
@@ -74,13 +74,12 @@ export default function PoweredBySection() {
                                 alt={logo.name}
                                 width={logo.width}
                                 height={logo.height}
-                                className="object-contain transition-all duration-500 group-hover:brightness-110"
+                                className="object-contain transition-all duration-500 group-hover:brightness-110 rounded-lg"
                                 style={{
                                     width: "auto",
                                     height: "auto",
                                     maxWidth: `${logo.width}px`,
                                     maxHeight: `${logo.height}px`,
-                                    filter: logo.url.includes("dcodeblock") ? "none" : "brightness(0) invert(1) opacity(0.8)",
                                 }}
                             />
                         </div>
@@ -109,13 +108,12 @@ export default function PoweredBySection() {
                                 alt={logo.name}
                                 width={logo.width * 0.8}
                                 height={logo.height * 0.8}
-                                className="object-contain"
+                                className="object-contain rounded-lg"
                                 style={{
                                     width: "auto",
                                     height: "auto",
                                     maxWidth: `${logo.width * 0.8}px`,
                                     maxHeight: `${logo.height * 0.8}px`,
-                                    filter: logo.url.includes("dcodeblock") ? "none" : "brightness(0) invert(1) opacity(0.8)",
                                 }}
                             />
                         </div>
@@ -129,8 +127,8 @@ export default function PoweredBySection() {
                             key={index}
                             onClick={() => setCurrentIndex(index)}
                             className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex
-                                ? "bg-gradient-to-r from-green-400 to-blue-400 scale-125"
-                                : "bg-gray-600 hover:bg-gray-500"
+                                    ? "bg-gradient-to-r from-green-400 to-blue-400 scale-125"
+                                    : "bg-gray-600 hover:bg-gray-500"
                                 }`}
                         />
                     ))}

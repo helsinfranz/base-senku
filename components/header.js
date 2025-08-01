@@ -54,7 +54,7 @@ export default function Header() {
             className={`text-sm font-medium transition-colors ${isActivePage("/swap") ? "text-green-400" : "text-white hover:text-green-400"
               }`}
           >
-            Token Swap
+            Swap
           </Link>
           <Link
             href="/profile"

@@ -236,8 +236,8 @@ export default function SwapPage() {
                                             max={mdsBalance}
                                         />
                                         <div className="flex items-center space-x-2 bg-purple-700/50 rounded-lg px-3 py-2">
-                                            <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                                                <span className="text-white text-xs font-bold">M</span>
+                                            <div className="relative w-6 h-6">
+                                                <Image src="/logo.png" alt="MDS" width={24} height={24} className="rounded-full" />
                                             </div>
                                             <span className="text-white font-semibold">MDS</span>
                                         </div>
@@ -269,13 +269,7 @@ export default function SwapPage() {
                                         />
                                         <div className="flex items-center space-x-2 bg-blue-700/50 rounded-lg px-3 py-2">
                                             <div className="relative w-6 h-6">
-                                                <Image
-                                                    src="/android-chrome-192x192.png"
-                                                    alt="FLUOR"
-                                                    width={24}
-                                                    height={24}
-                                                    className="rounded-full"
-                                                />
+                                                <Image src="/logo.png" alt="FLUOR" width={24} height={24} className="rounded-full" />
                                             </div>
                                             <span className="text-white font-semibold">FLUOR</span>
                                         </div>

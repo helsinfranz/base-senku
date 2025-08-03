@@ -7,12 +7,28 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import { useWallet } from "@/contexts/wallet-context"
-import { Atom, Beaker, Trophy, Zap, Gem, TrendingUp, Gift, ArrowRightLeft, AlertTriangle } from "lucide-react"
+import {
+  Atom,
+  Beaker,
+  Trophy,
+  Zap,
+  Gem,
+  TrendingUp,
+  Gift,
+  ArrowRightLeft,
+  AlertTriangle,
+  Calendar,
+  Target,
+  Users,
+  Coins,
+  PieChart,
+} from "lucide-react"
 import Image from "next/image"
 
 export default function HomePage() {
   const { isConnected } = useWallet()
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [hoveredSegment, setHoveredSegment] = useState(null)
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -25,6 +41,106 @@ export default function HomePage() {
     window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
+
+  // Tokenomics data
+  const tokenomicsData = [
+    {
+      label: "Public Sale",
+      percentage: 37.5,
+      color: "#16a34a", // green-500
+      hoverColor: "#22c55e", // green-600
+      description: "Available for public purchase and trading",
+    },
+    {
+      label: "Liquidity Pool",
+      percentage: 12.5,
+      color: "#2563eb", // blue-500
+      hoverColor: "#3b82f6", // blue-600
+      description: "Reserved for DEX liquidity provision",
+    },
+    {
+      label: "KOLs & Marketing",
+      percentage: 16.7,
+      color: "#d97706", // amber-500
+      hoverColor: "#f59e0b", // amber-600
+      description: "Key Opinion Leaders and marketing initiatives",
+    },
+    {
+      label: "Development Team",
+      percentage: 16.7,
+      color: "#7c3aed", // violet-500
+      hoverColor: "#8b5cf6", // violet-600
+      description: "Core development team allocation",
+    },
+    {
+      label: "Ecosystem Growth",
+      percentage: 16.6,
+      color: "#db2777", // pink-500
+      hoverColor: "#ec4899", // pink-600
+      description: "Future partnerships and ecosystem expansion",
+    },
+  ]
+
+  // Roadmap phases
+  const roadmapPhases = [
+    {
+      quarter: "Q3 2025",
+      phase: "PHASE 1: ECONOMIC EXPANSION",
+      color: "from-green-500 to-emerald-600",
+      items: [
+        "Launch of $MDS Token",
+        "$MDS to FLUOR One-Way Swap System",
+        "Enhanced Gameplay Integration",
+        "New Level Additions & User Experience Testing",
+      ],
+    },
+    {
+      quarter: "Q4 2025",
+      phase: "PHASE 2: THE FORGE CREATION",
+      color: "from-blue-500 to-cyan-600",
+      items: [
+        "KOSB to Ranked NFT Conversion System",
+        "Legendary & Epic Tier NFT Minting",
+        "NFT Marketplace Integration",
+        "Advanced Collectible Trading Features",
+      ],
+    },
+    {
+      quarter: "Q1 2026",
+      phase: "PHASE 3: COMPETITIVE ECOSYSTEM",
+      color: "from-purple-500 to-violet-600",
+      items: [
+        "Global Leaderboard System",
+        "High-Ranking Player Rewards",
+        "FLUOR-Based DAO Governance",
+        "FORGE NFT Utility Expansion",
+      ],
+    },
+    {
+      quarter: "Q2 2026",
+      phase: "PHASE 4: ARC SEASONS & STONE WORLD",
+      color: "from-orange-500 to-red-600",
+      items: [
+        "Dr. Stone Storyline Integration",
+        "Multi-Difficulty Level Campaigns",
+        "Educational Material Cards System",
+        "Interactive Science Learning Quizzes",
+        "Stone Age Civilization Building Narrative",
+      ],
+    },
+    {
+      quarter: "Q3 2026",
+      phase: "PHASE 5: COMMUNITY MARKETPLACE",
+      color: "from-pink-500 to-rose-600",
+      items: [
+        "In-Game Store System Launch",
+        "FLUOR & MDS Token Item Purchases",
+        "DAO-Governed Item Catalog",
+        "Community-Driven Store Features",
+        "Premium Cosmetics & Utility Items",
+      ],
+    },
+  ]
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -362,6 +478,178 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
+          {/* Roadmap Section */}
+          <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50 mb-12 md:mb-16">
+            <CardContent className="p-6 md:p-8">
+              <div className="text-center mb-8 md:mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center justify-center">
+                  <Calendar className="w-8 h-8 mr-3 text-green-400" />
+                  Development Roadmap
+                </h2>
+                <p className="text-gray-400 text-base md:text-lg">Our journey to revolutionize science gaming</p>
+              </div>
+
+              <div className="relative">
+                {/* Main timeline line */}
+                <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-green-400 via-blue-400 via-purple-400 via-orange-400 to-pink-400 hidden md:block"></div>
+
+                <div className="space-y-8">
+                  {roadmapPhases.map((phase, index) => (
+                    <div key={index} className="relative">
+                      <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-6">
+                        {/* Quarter Badge */}
+                        <div
+                          className={`flex-shrink-0 bg-gradient-to-r ${phase.color} rounded-full p-3 border-2 border-white/20 hover:scale-110 hover:brightness-125 transition-all duration-300 relative z-20`}
+                        >
+                          <Target className="w-6 h-6 text-white" />
+                        </div>
+
+                        {/* Phase Content */}
+                        <div className="flex-1">
+                          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700/30 hover:border-gray-600/50 transition-all duration-300">
+                            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                              <div>
+                                <h3 className="text-lg md:text-xl font-bold text-white mb-1">{phase.phase}</h3>
+                                <p
+                                  className={`text-sm font-semibold bg-gradient-to-r ${phase.color} bg-clip-text text-transparent`}
+                                >
+                                  {phase.quarter}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {phase.items.map((item, itemIndex) => (
+                                <div key={itemIndex} className="flex items-start space-x-3">
+                                  <div
+                                    className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-gradient-to-r ${phase.color}`}
+                                  ></div>
+                                  <p className="text-gray-300 text-sm">{item}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Tokenomics Section */}
+          <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50 mb-12 md:mb-16">
+            <CardContent className="p-6 md:p-8">
+              <div className="text-center mb-8 md:mb-12">
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center justify-center">
+                  <PieChart className="w-8 h-8 mr-3 text-blue-400" />
+                  MDS Tokenomics
+                </h2>
+                <p className="text-gray-400 text-base md:text-lg">Token distribution and allocation breakdown</p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                {/* Pie Chart */}
+                <div className="flex justify-center">
+                  <div className="relative w-80 h-80">
+                    <svg viewBox="0 0 200 200" className="w-full h-full transform -rotate-90">
+                      {tokenomicsData.map((segment, index) => {
+                        const startAngle = tokenomicsData
+                          .slice(0, index)
+                          .reduce((sum, s) => sum + s.percentage * 3.6, 0)
+                        const endAngle = startAngle + segment.percentage * 3.6
+                        const largeArcFlag = segment.percentage > 50 ? 1 : 0
+
+                        const x1 = 100 + 80 * Math.cos((startAngle * Math.PI) / 180)
+                        const y1 = 100 + 80 * Math.sin((startAngle * Math.PI) / 180)
+                        const x2 = 100 + 80 * Math.cos((endAngle * Math.PI) / 180)
+                        const y2 = 100 + 80 * Math.sin((endAngle * Math.PI) / 180)
+
+                        const pathData = [
+                          `M 100 100`,
+                          `L ${x1} ${y1}`,
+                          `A 80 80 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+                          `Z`,
+                        ].join(" ")
+
+                        return (
+                          <path
+                            key={index}
+                            d={pathData}
+                            fill={hoveredSegment === index ? segment.hoverColor : segment.color}
+                            stroke="#1f2937"
+                            strokeWidth="2"
+                            className="transition-all duration-300 cursor-pointer hover:opacity-90"
+                            onMouseEnter={() => setHoveredSegment(index)}
+                            onMouseLeave={() => setHoveredSegment(null)}
+                          />
+                        )
+                      })}
+                    </svg>
+
+                    {/* Center circle */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-gray-900 rounded-full w-24 h-24 flex items-center justify-center border-4 border-gray-700">
+                        <Coins className="w-8 h-8 text-yellow-400" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="space-y-4">
+                  {tokenomicsData.map((segment, index) => (
+                    <div
+                      key={index}
+                      className={`bg-gray-800/30 rounded-lg p-4 border transition-all duration-300 cursor-pointer ${hoveredSegment === index
+                          ? "border-gray-500/50 bg-gray-800/50 transform scale-105"
+                          : "border-gray-700/30"
+                        }`}
+                      onMouseEnter={() => setHoveredSegment(index)}
+                      onMouseLeave={() => setHoveredSegment(null)}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-3">
+                          <div
+                            className="w-4 h-4 rounded-full"
+                            style={{ backgroundColor: hoveredSegment === index ? segment.hoverColor : segment.color }}
+                          ></div>
+                          <h4 className="text-white font-semibold">{segment.label}</h4>
+                        </div>
+                        <span className="text-xl font-bold text-white">{segment.percentage}%</span>
+                      </div>
+                      <p className="text-gray-400 text-sm ml-7">{segment.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Additional Info */}
+              <div className="mt-8 pt-6 border-t border-gray-700/50">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-gradient-to-r from-green-900/20 to-green-800/20 rounded-lg p-4 border border-green-500/30 text-center">
+                    <Users className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                    <h4 className="text-green-400 font-semibold mb-1">Community First</h4>
+                    <p className="text-gray-300 text-sm">37.5% allocated for public participation</p>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-blue-900/20 to-blue-800/20 rounded-lg p-4 border border-blue-500/30 text-center">
+                    <Zap className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                    <h4 className="text-blue-400 font-semibold mb-1">Liquidity Secured</h4>
+                    <p className="text-gray-300 text-sm">12.5% ensures stable trading</p>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-purple-900/20 to-purple-800/20 rounded-lg p-4 border border-purple-500/30 text-center">
+                    <Target className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                    <h4 className="text-purple-400 font-semibold mb-1">Long-term Vision</h4>
+                    <p className="text-gray-300 text-sm">50% for sustainable development</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Social Media Footer */}
           <div className="text-center py-8">
             <div className="flex justify-center items-center space-x-6">
@@ -412,6 +700,30 @@ export default function HomePage() {
                   <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
                 </svg>
               </a>
+
+              {/* Whitepaper */}
+              <a
+                href="/whitepaper.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-full p-3 hover:border-green-500/50 transition-all duration-300 transform hover:scale-110"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-400 group-hover:text-green-400 transition-colors duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </a>
+
+              {/* Telegram */}
             </div>
           </div>
         </div>

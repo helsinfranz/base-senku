@@ -61,11 +61,11 @@ export const getReadOnlyContracts = (provider) => {
 }
 
 // Helper functions
-export const getProvider = () => {
-    if (typeof window !== "undefined" && window.ethereum) {
-        return new ethers.BrowserProvider(window.ethereum)
+export const getProvider = (walletProvider) => {
+    if (walletProvider && typeof window !== "undefined") {
+        return new ethers.BrowserProvider(walletProvider);
     }
-    return null
+    return null;
 }
 
 // Helper functions
@@ -73,8 +73,8 @@ export const getReadProvider = () => {
     return new ethers.JsonRpcProvider("https://sepolia.base.org")
 }
 
-export const getSigner = async () => {
-    const provider = getProvider()
+export const getSigner = async (walletProvider) => {
+    const provider = getProvider(walletProvider)
     if (provider) {
         return await provider.getSigner()
     }

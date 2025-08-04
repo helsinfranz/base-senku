@@ -314,6 +314,7 @@ function GameArenaContent() {
       }))
       await loadLevel(currentLevelId)
     } else {
+      toast.error("Payment failed. Please try again.")
       setGameState((prev) => ({ ...prev, isPayingToPlay: false }))
     }
   }
@@ -408,8 +409,8 @@ function GameArenaContent() {
                 onClick={handlePayToPlayCurrent}
                 disabled={fluorBalance < 1 || gameState.isPayingToPlay}
                 className={`w-full text-lg py-3 font-semibold rounded-lg transition-all duration-300 ${fluorBalance >= 1 && !gameState.isPayingToPlay
-                    ? "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white"
-                    : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+                  ? "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white"
+                  : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
                   }`}
               >
                 {gameState.isPayingToPlay

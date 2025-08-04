@@ -2,66 +2,52 @@
 
 import { createContext, useContext, useState, useEffect } from "react"
 import { getContracts, getReadOnlyContracts, getSigner, getReadProvider } from "@/utils/contracts"
+import { useAppKit, useAppKitState } from "@reown/appkit/react";
+import { useAppKitAccount, useDisconnect } from "@reown/appkit/react";
+import { useAppKitProvider } from "@reown/appkit/react";
 
 const WalletContext = createContext()
 
-// Base Sepolia Network Configuration
-const BASE_SEPOLIA = {
-  chainId: "0x14a34", // 84532 in hex
-  chainName: "Base Sepolia Testnet",
-  nativeCurrency: {
-    name: "Sepolia Ether",
-    symbol: "ETH",
-    decimals: 18,
-  },
-  rpcUrls: ["https://rpc.sepolia-api.base.org"],
-  blockExplorerUrls: ["https://base-sepolia.blockscout.com"],
-}
-
 export function WalletProvider({ children }) {
-  const [isConnected, setIsConnected] = useState(false)
-  const [walletAddress, setWalletAddress] = useState("")
-  const [isConnecting, setIsConnecting] = useState(false)
-  const [fluorBalance, setFluorBalance] = useState(0)
-  const [nftCount, setNftCount] = useState(0)
   const [playerData, setPlayerData] = useState({
     currentLevel: 0,
     levelsCompleted: 0,
     claimableRewardSets: 0,
     hasClaimedInitialTokens: false,
   })
-  const [contracts, setContracts] = useState(null)
   const [readOnlyContracts, setReadOnlyContracts] = useState(null)
+  const [isConnecting, setIsConnecting] = useState(false)
+  const [walletAddress, setWalletAddress] = useState("")
+  const [fluorBalance, setFluorBalance] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
+  const [contracts, setContracts] = useState(null)
+  const [nftCount, setNftCount] = useState(0)
+  const { walletProvider } = useAppKitProvider("eip155");
+  const { address, isConnected } = useAppKitAccount();
+  const { disconnect } = useDisconnect();
+  const { loading } = useAppKitState();
+  const { open } = useAppKit();
 
   useEffect(() => {
-    checkConnection()
-  }, [])
+    setIsConnecting(loading)
+  }, [loading])
 
   useEffect(() => {
-    if (isConnected && walletAddress && contracts && readOnlyContracts) {
+    if (address && isConnected) {
+      setWalletAddress(address)
+      initializeContracts()
+    }
+  }, [address, isConnected])
+
+  useEffect(() => {
+    if (isConnected && address && walletAddress && contracts && readOnlyContracts) {
       loadPlayerData()
     }
-  }, [isConnected, walletAddress, contracts, readOnlyContracts])
-
-  const checkConnection = async () => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: "eth_accounts" })
-        if (accounts.length > 0) {
-          setWalletAddress(accounts[0])
-          setIsConnected(true)
-          await initializeContracts()
-        }
-      } catch (error) {
-        console.error("Error checking connection:", error)
-      }
-    }
-  }
+  }, [isConnected, address, walletAddress, contracts, readOnlyContracts])
 
   const initializeContracts = async () => {
     try {
-      const signer = await getSigner()
+      const signer = await getSigner(walletProvider)
       const readProvider = getReadProvider()
       if (signer && readProvider) {
         const contractInstances = getContracts(signer)
@@ -113,35 +99,6 @@ export function WalletProvider({ children }) {
     }
   }
 
-  const addBaseSepoliaNetwork = async () => {
-    try {
-      await window.ethereum.request({
-        method: "wallet_addEthereumChain",
-        params: [BASE_SEPOLIA],
-      })
-      return true
-    } catch (error) {
-      console.error("Error adding network:", error)
-      return false
-    }
-  }
-
-  const switchToBaseSepolia = async () => {
-    try {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: BASE_SEPOLIA.chainId }],
-      })
-      return true
-    } catch (error) {
-      if (error.code === 4902) {
-        return await addBaseSepoliaNetwork()
-      }
-      console.error("Error switching network:", error)
-      return false
-    }
-  }
-
   const value = {
     isConnected,
     walletAddress,
@@ -154,46 +111,31 @@ export function WalletProvider({ children }) {
     isLoading,
     loadPlayerData,
     connectWallet: async () => {
-      if (!window.ethereum) {
-        console.error("Please install MetaMask or another Web3 wallet!")
-        return
-      }
-
       setIsConnecting(true)
-
       try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        })
-
-        if (accounts.length > 0) {
-          const networkSwitched = await switchToBaseSepolia()
-
-          if (networkSwitched) {
-            setWalletAddress(accounts[0])
-            setIsConnected(true)
-            await initializeContracts()
-          }
-        }
+        await open({ view: "Connect", namespace: "eip155" })
       } catch (error) {
         console.error("Error connecting wallet:", error)
-      } finally {
         setIsConnecting(false)
       }
     },
-    disconnectWallet: () => {
-      setIsConnected(false)
-      setWalletAddress("")
-      setFluorBalance(0)
-      setNftCount(0)
-      setPlayerData({
-        currentLevel: 0,
-        levelsCompleted: 0,
-        claimableRewardSets: 0,
-        hasClaimedInitialTokens: false,
-      })
-      setContracts(null)
-      setReadOnlyContracts(null)
+    disconnectWallet: async () => {
+      try {
+        await disconnect()
+        setWalletAddress("")
+        setFluorBalance(0)
+        setNftCount(0)
+        setPlayerData({
+          currentLevel: 0,
+          levelsCompleted: 0,
+          claimableRewardSets: 0,
+          hasClaimedInitialTokens: false,
+        })
+        setContracts(null)
+        setReadOnlyContracts(null)
+      } catch (error) {
+        console.error("Error disconnecting wallet:", error)
+      }
     },
     claimInitialTokens: async () => {
       if (!contracts || !walletAddress || !readOnlyContracts) {

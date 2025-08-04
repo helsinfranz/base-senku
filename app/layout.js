@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { WalletProvider } from "@/contexts/wallet-context"
 import { ToastProvider } from "@/components/toast"
+import { AppKit } from "../contexts/appkit"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -14,9 +14,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <WalletProvider>
+        <AppKit>
           <ToastProvider>{children}</ToastProvider>
-        </WalletProvider>
+        </AppKit>
       </body>
     </html>
   )

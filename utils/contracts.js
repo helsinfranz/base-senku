@@ -2,9 +2,11 @@ import { ethers } from "ethers"
 
 // Contract addresses
 export const CONTRACT_ADDRESSES = {
+    MEDUSA_SHARD_TOKEN: "0xC50A09C0B9b3357DbEfCB06c219C31FB8e5D5C55",
     FLUORITE_TOKEN: "0xCe95F6042F0859c046Ab0CdF9aEf69237b096300",
     KINGDOM_NFT: "0x096991aCB60160EF7B2344F9739Cd80d87AD5cEc",
     GAME_CONTROLLER: "0x3A2CBB7F0A7Cfa7C16F8b15bCfFa5c7C0864375E",
+    TOKEN_SWAP: "0x5EefdBd62Df837a4FE95D64583C7Ccf0e2ADe49f"
 }
 
 // Contract ABIs
@@ -13,6 +15,17 @@ export const FLUORITE_TOKEN_ABI = [
     "function approve(address spender, uint256 amount) returns (bool)",
     "function allowance(address owner, address spender) view returns (uint256)",
     "function transfer(address to, uint256 amount) returns (bool)",
+]
+
+export const MEDUSA_SHARD_TOKEN_ABI = [
+    "function balanceOf(address owner) view returns (uint256)",
+    "function approve(address spender, uint256 amount) returns (bool)",
+    "function allowance(address owner, address spender) view returns (uint256)",
+    "function transfer(address to, uint256 amount) returns (bool)",
+]
+
+export const TOKEN_SWAP_ABI = [
+    "function swapTokens(uint256 amount)",
 ]
 
 export const KINGDOM_NFT_ABI = [

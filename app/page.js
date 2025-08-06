@@ -59,25 +59,32 @@ export default function HomePage() {
       description: "Reserved for DEX liquidity provision",
     },
     {
-      label: "KOLs & Marketing",
-      percentage: 16.7,
+      label: "KOLs",
+      percentage: 10,
       color: "#d97706", // amber-500
       hoverColor: "#f59e0b", // amber-600
-      description: "Key Opinion Leaders and marketing initiatives",
+      description: "Amplify launch & shill",
     },
     {
       label: "Development Team",
-      percentage: 16.7,
+      percentage: 25,
       color: "#7c3aed", // violet-500
       hoverColor: "#8b5cf6", // violet-600
-      description: "Core development team allocation",
+      description: "Core developers & ops",
     },
     {
-      label: "Ecosystem Growth",
-      percentage: 16.6,
+      label: "Airdrops",
+      percentage: 5,
       color: "#db2777", // pink-500
       hoverColor: "#ec4899", // pink-600
-      description: "Future partnerships and ecosystem expansion",
+      description: "Quests & community rewards",
+    },
+    {
+      label: "DcodeBlock",
+      percentage: 10,
+      color: "#f97316", // orange-500
+      hoverColor: "#fb923c", // orange-600
+      description: "Support, infra & ops",
     },
   ]
 
@@ -561,10 +568,10 @@ export default function HomePage() {
                         const endAngle = startAngle + segment.percentage * 3.6
                         const largeArcFlag = segment.percentage > 50 ? 1 : 0
 
-                        const x1 = 100 + 80 * Math.cos((startAngle * Math.PI) / 180)
-                        const y1 = 100 + 80 * Math.sin((startAngle * Math.PI) / 180)
-                        const x2 = 100 + 80 * Math.cos((endAngle * Math.PI) / 180)
-                        const y2 = 100 + 80 * Math.sin((endAngle * Math.PI) / 180)
+                        const x1 = Number((100 + 80 * Math.cos((startAngle * Math.PI) / 180)).toFixed(3))
+                        const y1 = Number((100 + 80 * Math.sin((startAngle * Math.PI) / 180)).toFixed(3))
+                        const x2 = Number((100 + 80 * Math.cos((endAngle * Math.PI) / 180)).toFixed(3))
+                        const y2 = Number((100 + 80 * Math.sin((endAngle * Math.PI) / 180)).toFixed(3))
 
                         const pathData = [
                           `M 100 100`,
@@ -603,8 +610,8 @@ export default function HomePage() {
                     <div
                       key={index}
                       className={`bg-gray-800/30 rounded-lg p-4 border transition-all duration-300 cursor-pointer ${hoveredSegment === index
-                          ? "border-gray-500/50 bg-gray-800/50 transform scale-105"
-                          : "border-gray-700/30"
+                        ? "border-gray-500/50 bg-gray-800/50 transform scale-105"
+                        : "border-gray-700/30"
                         }`}
                       onMouseEnter={() => setHoveredSegment(index)}
                       onMouseLeave={() => setHoveredSegment(null)}

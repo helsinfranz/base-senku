@@ -50,13 +50,17 @@ export const GAME_CONTROLLER_ABI = [
 // Contract instances
 export const getContracts = (signer) => {
     const fluoriteToken = new ethers.Contract(CONTRACT_ADDRESSES.FLUORITE_TOKEN, FLUORITE_TOKEN_ABI, signer)
+    const medusaShardToken = new ethers.Contract(CONTRACT_ADDRESSES.MEDUSA_SHARD_TOKEN, MEDUSA_SHARD_TOKEN_ABI, signer)
     const kingdomNFT = new ethers.Contract(CONTRACT_ADDRESSES.KINGDOM_NFT, KINGDOM_NFT_ABI, signer)
     const gameController = new ethers.Contract(CONTRACT_ADDRESSES.GAME_CONTROLLER, GAME_CONTROLLER_ABI, signer)
+    const tokenSwap = new ethers.Contract(CONTRACT_ADDRESSES.TOKEN_SWAP, TOKEN_SWAP_ABI, signer)
 
     return {
         fluoriteToken,
+        medusaShardToken,
         kingdomNFT,
         gameController,
+        tokenSwap,
     }
 }
 

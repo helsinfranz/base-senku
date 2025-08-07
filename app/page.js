@@ -657,6 +657,88 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
+          {/* FAQ Section */}
+          <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50 mb-12">
+            <CardContent className="p-6 md:p-8">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Frequently Asked Questions</h2>
+                <p className="text-gray-400 text-base md:text-lg">Everything you need to know about Senku's Elixir</p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/70 transition-colors">
+                  <details className="group">
+                    <summary className="flex justify-between items-center cursor-pointer list-none">
+                      <span className="text-white font-semibold">What is Senku's Elixir?</span>
+                      <span className="transition group-open:rotate-180">
+                        <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24" className="text-green-400"><path d="M6 9l6 6 6-6"></path></svg>
+                      </span>
+                    </summary>
+                    <p className="text-gray-300 mt-4">
+                      Senku's Elixir is a web3 puzzle game inspired by Dr. Stone, where players solve challenging tube puzzles while earning FLUOR tokens and collecting unique Kingdom Blueprint NFTs.
+                    </p>
+                  </details>
+                </div>
+
+                <div className="bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/70 transition-colors">
+                  <details className="group">
+                    <summary className="flex justify-between items-center cursor-pointer list-none">
+                      <span className="text-white font-semibold">How do I earn FLUOR tokens?</span>
+                      <span className="transition group-open:rotate-180">
+                        <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24" className="text-green-400"><path d="M6 9l6 6 6-6"></path></svg>
+                      </span>
+                    </summary>
+                    <p className="text-gray-300 mt-4">
+                      You can earn FLUOR tokens by completing levels and claiming rewards. New players receive 5 FLUOR tokens to start, and you'll earn more tokens for every 5 levels completed. You can also swap MDS tokens for FLUOR.
+                    </p>
+                  </details>
+                </div>
+
+                <div className="bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/70 transition-colors">
+                  <details className="group">
+                    <summary className="flex justify-between items-center cursor-pointer list-none">
+                      <span className="text-white font-semibold">What are Kingdom Blueprint NFTs?</span>
+                      <span className="transition group-open:rotate-180">
+                        <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24" className="text-green-400"><path d="M6 9l6 6 6-6"></path></svg>
+                      </span>
+                    </summary>
+                    <p className="text-gray-300 mt-4">
+                      Kingdom Blueprint NFTs are unique collectibles that represent your achievements in the game. They can be minted for 10 FLUOR tokens and will have special utilities in future gameplay features.
+                    </p>
+                  </details>
+                </div>
+
+                <div className="bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/70 transition-colors">
+                  <details className="group">
+                    <summary className="flex justify-between items-center cursor-pointer list-none">
+                      <span className="text-white font-semibold">How does the MDS to FLUOR swap work?</span>
+                      <span className="transition group-open:rotate-180">
+                        <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24" className="text-green-400"><path d="M6 9l6 6 6-6"></path></svg>
+                      </span>
+                    </summary>
+                    <p className="text-gray-300 mt-4">
+                      The MDS to FLUOR swap is a one-way conversion at a 1:1 ratio. Once you swap MDS for FLUOR, the conversion cannot be reversed. FLUOR tokens are essential for playing levels and minting NFTs.
+                    </p>
+                  </details>
+                </div>
+
+                <div className="bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/70 transition-colors">
+                  <details className="group">
+                    <summary className="flex justify-between items-center cursor-pointer list-none">
+                      <span className="text-white font-semibold">What's on the roadmap?</span>
+                      <span className="transition group-open:rotate-180">
+                        <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24" className="text-green-400"><path d="M6 9l6 6 6-6"></path></svg>
+                      </span>
+                    </summary>
+                    <p className="text-gray-300 mt-4">
+                      Our roadmap includes exciting features like ranked NFT systems, global leaderboards, DAO governance, Dr. Stone storyline integration, and a community marketplace. Check out the full roadmap above for more details.
+                    </p>
+                  </details>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Social Media Footer */}
           <div className="text-center py-8">
             <div className="flex justify-center items-center space-x-6">

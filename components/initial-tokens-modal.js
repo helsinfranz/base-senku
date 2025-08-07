@@ -1,8 +1,10 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 export default function InitialTokensModal({ onClaim, isLoading }) {
+  const router = useRouter()
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-gray-900/90 backdrop-blur-md border border-gray-700/50 rounded-lg max-w-md w-full p-8 text-center">
@@ -20,13 +22,24 @@ export default function InitialTokensModal({ onClaim, isLoading }) {
           <p className="text-gray-400 text-sm">Starting Research Grant</p>
         </div>
 
-        <Button
-          onClick={onClaim}
-          disabled={isLoading}
-          className="w-full text-lg py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50"
-        >
-          {isLoading ? "Processing Transaction..." : "Claim 5 Free FLUOR"}
-        </Button>
+        <div className="space-y-3">
+          <Button
+            onClick={onClaim}
+            disabled={isLoading}
+            className="w-full text-lg py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white font-semibold rounded-lg transition-all duration-300 disabled:opacity-50"
+          >
+            {isLoading ? "Processing Transaction..." : "Claim 5 Free FLUOR"}
+          </Button>
+
+          <Button
+            onClick={() => router.push('/')}
+            disabled={isLoading}
+            variant="outline"
+            className="w-full text-lg py-3 bg-gray-800/50 border-gray-600/50 text-white hover:bg-gray-700/50 hover:text-white font-semibold rounded-lg transition-all duration-300"
+          >
+            Return to Home
+          </Button>
+        </div>
 
         <p className="text-gray-400 text-xs mt-4">
           {isLoading

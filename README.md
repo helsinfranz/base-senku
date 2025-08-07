@@ -41,25 +41,29 @@ Senku's Elixir is an innovative blockchain-based puzzle game that combines strat
 ### Installation
 
 1. Clone the repository:
-   \`\`\`bash
-   git clone https://github.com/helsinfranz/base-senku.git
-   cd base-senku
-   \`\`\`
+
+```bash
+git clone https://github.com/helsinfranz/base-senku.git
+cd base-senku
+```
 
 2. Install dependencies:
-   \`\`\`bash
-   pnpm install
-   \`\`\`
+
+```bash
+pnpm install
+```
 
 3. Create a .env file based on env.example:
-   \`\`\`bash
-   cp env.example .env.local
-   \`\`\`
+
+```bash
+cp env.example .env.local
+```
 
 4. Start the development server:
-   \`\`\`bash
-   pnpm dev
-   \`\`\`
+
+```bash
+pnpm dev
+```
 
 Visit http://localhost:3000 to start playing!
 
@@ -72,13 +76,49 @@ Visit http://localhost:3000 to start playing!
 5. Complete levels to earn rewards
 6. Collect special NFTs using FLUOR tokens
 
+## 💎 Token System
+
+### FLUOR Token
+
+- **Type**: Primary in-game utility token
+- **Standard**: ERC-20
+- **Network**: Base Sepolia
+- **Address**: `0xCe95F6042F0859c046Ab0CdF9aEf69237b096300`
+- **Use Cases**:
+  - Start new levels (1 FLUOR per level)
+  - Unlock special NFTs
+  - Earn rewards for completing levels
+  - New players receive 5 FLUOR for free
+
+### MDS Token (Medusa Shards)
+
+- **Type**: DEX Utility Token with swap utility
+- **Standard**: ERC-20
+- **Network**: Base Sepolia
+- **Address**: `0xC50A09C0B9b3357DbEfCB06c219C31FB8e5D5C55`
+- **Use Cases**:
+  - One-way swap to FLUOR (1:1 ratio)
+  - Future ecosystem utility
+
+### Token Swap System
+
+- **Contract**: `0x5EefdBd62Df837a4FE95D64583C7Ccf0e2ADe49f`
+- **Features**:
+  - One-way conversion from MDS to FLUOR
+  - 1:1 swap ratio
+  - No swap fees (only network gas)
+  - Two-step process: Approve → Swap
+
 ## 💎 Tokenomics
 
-- **Public Sale**: 37.5%
-- **Liquidity Pool**: 12.5%
-- **KOLs & Marketing**: 16.7%
-- **Development Team**: 16.7%
-- **Ecosystem Growth**: 16.6%
+### MDS Distribution
+
+- **Public Sale**: 37.5% - Available for public purchase and trading
+- **Liquidity Pool**: 12.5% - Reserved for DEX liquidity provision
+- **KOLs**: 10% - Amplify launch & shill
+- **Development Team**: 25% - Core development team allocation
+- **Airdrops**: 5% - Quests & community rewards
+- **DcodeBlock**: 10% - Support, infra & ops
 
 ## 🗺️ Roadmap
 
@@ -115,9 +155,9 @@ Visit http://localhost:3000 to start playing!
 - [Ethers.js](https://docs.ethers.org/v6/)
 - [Solidity](https://soliditylang.org/)
 
-## � Smart Contracts
+## 📝 Smart Contracts
 
-All our smart contracts are deployed on the Base Network and verified on Basescout.
+All our smart contracts are deployed on the Base Sepolia Testnet and verified on Blockscout. The game is currently in beta testing phase on testnet before mainnet deployment.
 
 ### FluoriteToken (FLUOR)
 
@@ -125,6 +165,20 @@ All our smart contracts are deployed on the Base Network and verified on Basesco
 - [View on Basescout](https://base-sepolia.blockscout.com/address/0xCe95F6042F0859c046Ab0CdF9aEf69237b096300)
 - ERC-20 token that powers the game economy
 - Used for level entry, rewards, and NFT minting
+
+### MedusaShardToken (MDS)
+
+- **Contract Address**: `0xC50A09C0B9b3357DbEfCB06c219C31FB8e5D5C55`
+- [View on Basescout](https://base-sepolia.blockscout.com/address/0xC50A09C0B9b3357DbEfCB06c219C31FB8e5D5C55)
+- ERC-20 utility token for Senku's Elixir.
+- Future ecosystem utility
+
+### TokenSwap
+
+- **Contract Address**: `0x5EefdBd62Df837a4FE95D64583C7Ccf0e2ADe49f`
+- [View on Basescout](https://base-sepolia.blockscout.com/address/0x5EefdBd62Df837a4FE95D64583C7Ccf0e2ADe49f)
+- One-way swap contract MDS to FLOUR
+- Allows users to swap MDS tokens for FLOUR tokens at a fixed rate
 
 ### KingdomBlueprintNFT (KOSB)
 
@@ -141,7 +195,7 @@ All our smart contracts are deployed on the Base Network and verified on Basesco
 - Handles level completion verification and reward distribution
 - Manages NFT minting and token interactions
 
-## �📄 License
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
@@ -158,8 +212,8 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ---
 
 <div align="center">
-  <img src="https://senkuselixir.xyz/brands/base.png" alt="Base Network" height="30"/>
-  <img src="https://senkuselixir.xyz/brands/dcb.jpg" alt="DCB" height="30"/>
-  <img src="https://senkuselixir.xyz/brands/mds.png" alt="MDS" height="30"/>
-  <img src="https://senkuselixir.xyz/brands/virtuals.png" alt="Virtuals" height="30"/>
+  <img src="https://senkuselixir.xyz/brands/base.png" alt="Base Network" height="45"/>
+  <img src="https://senkuselixir.xyz/brands/dcb.jpg" alt="DCB" height="45"/>
+  <img src="https://senkuselixir.xyz/brands/mds.png" alt="MDS" height="45"/>
+  <img src="https://senkuselixir.xyz/brands/virtuals.png" alt="Virtuals" height="45"/>
 </div>

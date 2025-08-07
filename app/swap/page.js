@@ -11,9 +11,7 @@ import { useWallet } from "@/contexts/wallet-context"
 import { useToast } from "@/components/toast"
 import { ethers } from "ethers"
 import Image from "next/image"
-
-// MDS Token Contract Address (Base Sepolia)
-const MDS_TOKEN_ADDRESS = "0x1234567890123456789012345678901234567890" // Replace with actual MDS token address
+import { CONTRACT_ADDRESSES } from "@/utils/contracts";
 
 export default function SwapPage() {
     const { isConnected, walletAddress, fluorBalance, loadPlayerData, contracts } = useWallet()
@@ -26,6 +24,8 @@ export default function SwapPage() {
     const [isProcessing, setIsProcessing] = useState(false)
     const [mdsBalance, setMdsBalance] = useState(0)
     const [isLoadingBalance, setIsLoadingBalance] = useState(false)
+    const [isApproved, setIsApproved] = useState(false)
+    const [isApproving, setIsApproving] = useState(false)
 
     // Redirect if not connected
     useEffect(() => {
@@ -42,30 +42,21 @@ export default function SwapPage() {
     }, [isConnected, walletAddress])
 
     const loadMdsBalance = async () => {
-        if (!walletAddress) return
+        if (!walletAddress || !isConnected || !contracts) return
 
         setIsLoadingBalance(true)
         try {
-            const provider = new ethers.JsonRpcProvider("https://sepolia.base.org")
-            const mdsContract = new ethers.Contract(
-                MDS_TOKEN_ADDRESS,
-                ["function balanceOf(address owner) view returns (uint256)"],
-                provider,
-            )
-
-            const balance = await mdsContract.balanceOf(walletAddress)
+            const balance = await contracts.medusaShardToken.balanceOf(walletAddress)
             const balanceFormatted = Number(ethers.formatEther(balance))
             setMdsBalance(balanceFormatted)
         } catch (error) {
             console.error("Error loading MDS balance:", error)
-            // Mock balance for demo
-            setMdsBalance(100)
         } finally {
             setIsLoadingBalance(false)
         }
     }
 
-    const handleSwap = async () => {
+    const handleApprove = async () => {
         if (!swapAmount || Number.parseFloat(swapAmount) <= 0) {
             toast.error("Please enter a valid amount to swap")
             return
@@ -81,58 +72,57 @@ export default function SwapPage() {
             return
         }
 
-        setIsSwapping(true)
+        setIsApproving(true)
 
         try {
             toast.info("Please approve the MDS token transfer in your wallet...")
 
-            // First, approve the MDS token transfer
-            const mdsContract = new ethers.Contract(
-                MDS_TOKEN_ADDRESS,
-                [
-                    "function approve(address spender, uint256 amount) returns (bool)",
-                    "function transfer(address to, uint256 amount) returns (bool)",
-                ],
-                contracts.gameController.runner, // Use the signer from contracts
-            )
-
-            // For demo purposes, we'll simulate sending MDS to a backend address
-            const backendAddress = "0x742d35Cc6634C0532925a3b8D0C9C0E0C0C0C0C0" // Replace with actual backend address
+            // Approve the MDS token transfer
             const amountWei = ethers.parseEther(swapAmount)
+            const approved = await contracts.medusaShardToken.approve(CONTRACT_ADDRESSES.TOKEN_SWAP, amountWei)
 
-            // Send MDS tokens to backend
-            const tx = await mdsContract.transfer(backendAddress, amountWei)
+            await approved.wait() // Wait for approval transaction to be confirmed
+            
+            toast.success("MDS token transfer approved!")
+            setIsApproved(true)
+        } catch (error) {
+            console.error("Approval error:", error)
+            if (error.code === 4001) {
+                toast.warning("Approval cancelled by user")
+            } else {
+                toast.error("Approval failed. Please try again.")
+            }
+        } finally {
+            setIsApproving(false)
+        }
+    }
+
+    const handleSwap = async () => {
+        if (!isApproved) {
+            toast.error("Please approve the token transfer first")
+            return
+        }
+
+        setIsSwapping(true)
+
+        try {
+            const amountWei = ethers.parseEther(swapAmount)
+            // Swap MDS tokens for FLOUR Token
+            const tx = await contracts.tokenSwap.swapTokens(amountWei)
             setTxHash(tx.hash)
 
             toast.success("MDS transfer submitted! Processing swap...")
             setIsProcessing(true)
 
             // Wait for transaction confirmation
-            const receipt = await tx.wait()
+            await tx.wait()
 
-            // Send transaction details to backend for verification and FLUOR transfer
-            const response = await fetch("/api/swap/process", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    txHash: tx.hash,
-                    amount: swapAmount,
-                }),
-            })
-
-            const data = await response.json()
-
-            if (data.success) {
-                toast.success(`Successfully swapped ${swapAmount} MDS for ${swapAmount} FLUOR!`)
-                setSwapAmount("")
-                setTxHash("")
-                await loadPlayerData(true) // Refresh FLUOR balance
-                await loadMdsBalance() // Refresh MDS balance
-            } else {
-                toast.error(data.message || "Swap failed. Please contact support.")
-            }
+            toast.success(`Successfully swapped ${swapAmount} MDS for ${swapAmount} FLUOR!`)
+            setSwapAmount("")
+            setTxHash(tx.hash)
+            setIsApproved(false) // Reset approval state
+            await loadPlayerData(true) // Refresh FLUOR balance
+            await loadMdsBalance() // Refresh MDS balance
         } catch (error) {
             console.error("Swap error:", error)
             if (error.code === 4001) {
@@ -227,11 +217,11 @@ export default function SwapPage() {
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <input
-                                            type="number"
+                                            type="text"
                                             value={swapAmount}
                                             onChange={(e) => setSwapAmount(e.target.value)}
                                             placeholder="0.0"
-                                            className="flex-1 bg-transparent text-white text-2xl font-bold outline-none placeholder-gray-500"
+                                            className="flex-1 bg-transparent text-white text-2xl font-bold outline-none placeholder-gray-500 appearance-none"
                                             disabled={isSwapping || isProcessing}
                                             max={mdsBalance}
                                         />
@@ -328,36 +318,49 @@ export default function SwapPage() {
                                 </div>
                             )}
 
-                            {/* Swap Button */}
-                            <Button
-                                onClick={handleSwap}
-                                disabled={
-                                    !swapAmount ||
-                                    Number.parseFloat(swapAmount) <= 0 ||
-                                    Number.parseFloat(swapAmount) > mdsBalance ||
-                                    isSwapping ||
-                                    isProcessing
-                                }
-                                className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${!swapAmount ||
+                            {/* Approve/Swap Buttons */}
+                            {!isApproved ? (
+                                <Button
+                                    onClick={handleApprove}
+                                    disabled={
+                                        !swapAmount ||
                                         Number.parseFloat(swapAmount) <= 0 ||
                                         Number.parseFloat(swapAmount) > mdsBalance ||
-                                        isSwapping ||
-                                        isProcessing
-                                        ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
-                                        : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"
+                                        isApproving
+                                    }
+                                    className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${
+                                        !swapAmount ||
+                                        Number.parseFloat(swapAmount) <= 0 ||
+                                        Number.parseFloat(swapAmount) > mdsBalance ||
+                                        isApproving
+                                            ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+                                            : "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white"
                                     }`}
-                            >
-                                {isSwapping ? "Confirming Transaction..." : isProcessing ? "Processing Swap..." : "Swap Tokens"}
-                            </Button>
+                                >
+                                    {isApproving ? "Approving..." : "Approve MDS Transfer"}
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={handleSwap}
+                                    disabled={isSwapping || isProcessing}
+                                    className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${
+                                        isSwapping || isProcessing
+                                            ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+                                            : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"
+                                    }`}
+                                >
+                                    {isSwapping ? "Confirming Transaction..." : isProcessing ? "Processing Swap..." : "Swap Tokens"}
+                                </Button>
+                            )}
 
                             {/* Info Section */}
                             <div className="mt-6 p-4 bg-blue-900/20 rounded-lg border border-blue-500/30">
-                                <h4 className="text-blue-400 font-semibold mb-2">How it works:</h4>
+                                <h4 className="text-blue-400 font-semibold mb-2">Swap Process:</h4>
                                 <ul className="text-gray-300 text-sm space-y-1">
-                                    <li>• Send your MDS tokens to our secure address</li>
-                                    <li>• We verify the transaction on Base blockchain</li>
-                                    <li>• Receive the same amount in FLUOR tokens instantly</li>
-                                    <li>• Use FLUOR to play levels and unlock NFTs in the game</li>
+                                    <li>• Input the amount of MDS you wish to swap</li>
+                                    <li>• Approve the transaction in your wallet</li>
+                                    <li>• MDS tokens will be converted to FLUOR at a 1:1 rate</li>
+                                    <li>• Use FLUOR to enhance your gaming experience</li>
                                 </ul>
                             </div>
                         </CardContent>

@@ -47,7 +47,7 @@ export default function Header() {
             className={`text-sm font-medium transition-colors ${isActivePage("/game") ? "text-green-400" : "text-white hover:text-green-400"
               }`}
           >
-            Game Arena
+            Game
           </Link>
           <Link
             href="/swap"

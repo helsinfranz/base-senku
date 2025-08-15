@@ -34,6 +34,8 @@ function GameArenaContent() {
   })
 
   const [currentLevelId, setCurrentLevelId] = useState(1)
+  const [showHelp, setShowHelp] = useState(false)
+  const [showCongratulations, setShowCongratulations] = useState(false)
 
   const [tubes, setTubes] = useState([])
   const [selectedTube, setSelectedTube] = useState(null)
@@ -55,6 +57,12 @@ function GameArenaContent() {
     }
     // Don't automatically hide the modal here - let the claim success handle it
   }, [playerData.hasClaimedInitialTokens, fluorBalance, walletLoading])
+
+  useEffect(() => {
+    if (playerData.levelsCompleted >= 100) {
+      setShowCongratulations(true)
+    }
+  }, [playerData.levelsCompleted])
 
   const determineCurrentLevel = () => {
     let levelToLoad = 1
@@ -175,6 +183,8 @@ function GameArenaContent() {
       setTimeout(() => {
         determineCurrentLevel()
       }, 2000) // Longer delay to ensure blockchain state is updated
+    } else {
+      toast.error("Failed to claim initial tokens. Please try again.")
     }
   }
 
@@ -201,6 +211,8 @@ function GameArenaContent() {
       setTimeout(() => {
         determineCurrentLevel()
       }, 2000) // Longer delay to ensure blockchain state is updated
+    } else {
+      toast.error("Failed to claim rewards. Please try again.")
     }
     setGameState((prev) => ({ ...prev, isClaimingReward: false }))
   }
@@ -250,6 +262,8 @@ function GameArenaContent() {
       const success = await unlockNft()
       if (success) {
         toast.success("NFT minted successfully!")
+      } else {
+        toast.error("Failed to mint NFT. Please try again.")
       }
     }
   }
@@ -319,7 +333,7 @@ function GameArenaContent() {
     }
   }
 
-  if ((isLoading || walletLoading) && !gameState.showInitialTokens && !gameState.needsPayment) {
+  if ((isLoading || walletLoading) && !gameState.showInitialTokens && !gameState.needsPayment && !showCongratulations) {
     return (
       <div className="min-h-screen relative overflow-hidden">
         <ParticleBackground />
@@ -329,6 +343,93 @@ function GameArenaContent() {
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-400 mx-auto mb-4"></div>
             <p className="text-white text-xl">Loading Laboratory...</p>
             <p className="text-gray-400 text-sm mt-2">Preparing Level {currentLevelId}</p>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  // Show congratulations screen for completing level 100
+  if (showCongratulations) {
+    return (
+      <div className="min-h-screen relative overflow-hidden">
+        <ParticleBackground />
+        <Header />
+        <main className="relative z-10 flex items-center justify-center min-h-screen px-4">
+          <div className="max-w-lg mx-auto text-center">
+            <div className="bg-gray-900/90 backdrop-blur-md border border-gray-700/50 rounded-lg p-6 relative overflow-hidden">
+              {/* Falling Confetti Animation */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {[...Array(20)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute text-2xl animate-bounce"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `-20px`,
+                      animationDelay: `${Math.random() * 2}s`,
+                      animationDuration: `${2 + Math.random() * 2}s`,
+                      animationIterationCount: "infinite",
+                      transform: `translateY(${Math.random() * 500 + 400}px)`,
+                    }}
+                  >
+                    {["🎉", "🎊", "✨", "🏆", "🧪", "⚗️"][Math.floor(Math.random() * 6)]}
+                  </div>
+                ))}
+              </div>
+
+              <div className="relative z-10">
+                <div className="text-6xl mb-4">🏆</div>
+                <h1 className="text-3xl font-bold text-white mb-3">Congratulations!</h1>
+                <p className="text-lg text-green-400 mb-4">You completed the first 100 levels!</p>
+                <p className="text-gray-300 text-sm mb-6">Master Scientist of the Kingdom of Science</p>
+
+                <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 rounded-lg p-4 mb-6 border border-green-500/30">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl font-bold text-green-400">100</div>
+                      <div className="text-gray-300 text-xs">Levels</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-blue-400">{fluorBalance.toFixed(0)}</div>
+                      <div className="text-gray-300 text-xs">FLUOR</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-purple-400">{nftCount}</div>
+                      <div className="text-gray-300 text-xs">NFTs</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      const text =
+                        "10 billion percent done! ✅ I've conquered all 100 levels of @SenkusElixir and mastered liquid alchemy. Think you can solve them faster? 🧪🏆 #SenkusElixir #Web3Gaming #PuzzleGames";
+                      const url = "https://www.senkuselixir.xyz";
+                      window.open(
+                        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+                        "_blank",
+                      );
+                    }}
+                    className="flex-1 bg-black hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 text-sm flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                    Share on X
+                  </button>
+                  {/* <button
+                    onClick={() => setShowCongratulations(false)}
+                    className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 text-sm"
+                  >
+                    Close
+                  </button> */}
+                </div>
+
+                <p className="text-gray-400 text-xs mt-4">More levels coming soon!</p>
+              </div>
+            </div>
           </div>
         </main>
       </div>
@@ -376,7 +477,7 @@ function GameArenaContent() {
                 </div>
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-gray-400">Your Balance:</span>
-                  <span className="text-blue-400 font-bold text-xl">{fluorBalance.toFixed(2)} FLUOR</span>
+                  <span className="text-blue-400 font-bold text-xl">{fluorBalance.toFixed(0)} FLUOR</span>
                 </div>
                 {canClaimReward && (
                   <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-600/50">
@@ -445,7 +546,7 @@ function GameArenaContent() {
 
       <main className="relative z-10 pt-24 pb-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-6 md:mb-8">
+          <div className="text-center mb-6 md:mb-8 relative">
             <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">Laboratory Arena</h1>
             <p className="text-green-400 text-base md:text-lg">Level {currentLevelId}</p>
             <div className="text-sm text-gray-400 mt-2">
@@ -457,6 +558,22 @@ function GameArenaContent() {
             {isCheckingCompletion && (
               <p className="text-yellow-400 text-sm mt-2 animate-pulse">Analyzing solution...</p>
             )}
+
+            {/* Help Button */}
+            <button
+              onClick={() => setShowHelp(true)}
+              className="absolute top-0 right-0 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 rounded-full p-2 transition-all duration-300"
+              title="How to Play"
+            >
+              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </button>
           </div>
 
           <GameBoard tubes={tubes} selectedTube={selectedTube} onTubeClick={handleTubeClick} />
@@ -474,6 +591,150 @@ function GameArenaContent() {
           />
         </div>
       </main>
+
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900/90 backdrop-blur-md border border-gray-700/50 rounded-lg max-w-2xl w-full p-6 md:p-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-white">How to Play</h2>
+              <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-white transition-colors">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Objective */}
+              <div>
+                <h3 className="text-xl font-semibold text-green-400 mb-3 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Main Objective
+                </h3>
+                <p className="text-gray-300 text-base">
+                  Sort all colored liquids so that each test tube contains only one color. Complete the level by
+                  organizing all liquids into separate, single-colored tubes.
+                </p>
+              </div>
+
+              {/* How to Play */}
+              <div>
+                <h3 className="text-xl font-semibold text-blue-400 mb-3 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  How to Play
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mt-0.5">
+                      1
+                    </div>
+                    <p className="text-gray-300">Click on a test tube to select it (it will glow and lift up)</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mt-0.5">
+                      2
+                    </div>
+                    <p className="text-gray-300">
+                      Click on another tube to pour the liquid from the first tube into the second
+                    </p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mt-0.5">
+                      3
+                    </div>
+                    <p className="text-gray-300">Continue sorting until each tube contains only one color</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rules */}
+              <div>
+                <h3 className="text-xl font-semibold text-orange-400 mb-3 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                  </svg>
+                  Important Rules
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-300">You can only pour liquid onto the same color or into empty tubes</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-300">Each test tube can hold a maximum of 4 liquid units</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-300">You can only move the top liquid from a tube</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-300">Use the Undo button to reverse your last move</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tips */}
+              <div>
+                <h3 className="text-xl font-semibold text-purple-400 mb-3 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
+                  </svg>
+                  Pro Tips
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-300">Plan your moves ahead - think about which tubes you'll need empty</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-300">Use empty tubes as temporary storage while sorting</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-300">Start by identifying which colors have the most scattered pieces</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-300">Don't be afraid to use the Reset button if you get stuck</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-700/50 text-center">
+              <button
+                onClick={() => setShowHelp(false)}
+                className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+              >
+                Got it! Let's Play
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

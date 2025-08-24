@@ -739,6 +739,78 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
+          {/* Feedback Section */}
+          <Card className="bg-gray-900/70 backdrop-blur-lg border border-gray-700/50 shadow-xl rounded-2xl mb-16">
+            <CardContent className="p-8 md:p-12">
+              <div className="space-y-8 max-w-3xl mx-auto">
+
+                {/* Heading */}
+                <div className="space-y-3">
+                  <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight text-center mb-8">
+                    Share Your Thoughts
+                  </h2>
+                  <p className="text-gray-300 text-base md:text-lg leading-relaxed">
+                    Got suggestions for game improvements? Curious about
+                    <span className="text-green-400 font-medium"> Dr. Stone</span> integrations?
+                    Or maybe you have fresh ideas for new
+                    <span className="text-blue-400 font-medium"> scientific puzzles</span>?
+                    Schedule a 15-minute chat directly with the founder!
+                  </p>
+                </div>
+
+                {/* Discussion Topics */}
+                <div className="bg-gradient-to-br from-green-900/30 via-blue-900/30 to-purple-900/30 rounded-2xl p-6 md:p-8 border border-green-500/40 shadow-md">
+                  <div className="space-y-5">
+                    <div className="flex items-center space-x-2 text-green-400">
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 
+                   9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 
+                   15.042 3 13.574 3 12c0-4.418 4.03-8 
+                   9-8s9 3.582 9 8z"
+                        />
+                      </svg>
+                      <span className="font-semibold text-lg">Topics we can discuss</span>
+                    </div>
+
+                    <ul className="text-gray-300 text-sm md:text-base space-y-2 pl-2">
+                      <li>• Game mechanics & level design</li>
+                      <li>• Dr. Stone storyline integration ideas</li>
+                      <li>• New features & puzzle concepts</li>
+                      <li>• Token economics & NFT utilities</li>
+                      <li>• Scientific accuracy & educational value</li>
+                    </ul>
+                  </div>
+
+                  {/* CTA Button */}
+                  <div className="flex items-center justify-center">
+                    <a
+                      href="https://calendly.com/senkuselixir/15min"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-8 px-10 py-3.5 text-lg font-semibold rounded-xl 
+                       transition-all duration-300 transform hover:scale-105 
+                       bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 
+                       hover:from-green-400 hover:via-blue-400 hover:to-purple-400 
+                       shadow-lg shadow-green-500/30 text-white "
+                    >
+                      Schedule a Chat
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+
           {/* Social Media Footer */}
           <div className="text-center py-8">
             <div className="flex justify-center items-center space-x-6">

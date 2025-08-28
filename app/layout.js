@@ -2,6 +2,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ToastProvider } from "@/components/toast"
 import { AppKit } from "../contexts/appkit"
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
         <AppKit>
           <ToastProvider>{children}</ToastProvider>
         </AppKit>
+        <Analytics />
       </body>
     </html>
   )

@@ -9,14 +9,33 @@ import { Button } from "@/components/ui/button"
 import { ArrowDownUp, ExternalLink, RefreshCw, AlertTriangle } from "lucide-react"
 import { useWallet } from "@/contexts/wallet-context"
 import { useToast } from "@/components/toast"
-import { ethers } from "ethers"
 import Image from "next/image"
-import { CONTRACT_ADDRESSES } from "@/utils/contracts";
+
+// Solana Imports
+
+import { useWallet as useSolanaWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import {
+    Connection,
+    PublicKey,
+    Transaction,
+} from "@solana/web3.js";
+import {
+    getAssociatedTokenAddress,
+    getAccount,
+    createTransferInstruction,
+} from "@solana/spl-token";
 
 export default function SwapPage() {
-    const { isConnected, walletAddress, fluorBalance, loadPlayerData, contracts } = useWallet()
+    const solanaWallet = useSolanaWallet();
+
+    // Solana Wallet Context Above.
+
+    const { isConnected, walletAddress, fluorBalance, loadPlayerData } = useWallet()
     const router = useRouter()
     const toast = useToast()
+
+    const connection = new Connection("https://api.devnet.solana.com", "confirmed");
 
     const [swapAmount, setSwapAmount] = useState("")
     const [isSwapping, setIsSwapping] = useState(false)
@@ -24,8 +43,6 @@ export default function SwapPage() {
     const [isProcessing, setIsProcessing] = useState(false)
     const [mdsBalance, setMdsBalance] = useState(0)
     const [isLoadingBalance, setIsLoadingBalance] = useState(false)
-    const [isApproved, setIsApproved] = useState(false)
-    const [isApproving, setIsApproving] = useState(false)
 
     // Redirect if not connected
     useEffect(() => {
@@ -34,21 +51,38 @@ export default function SwapPage() {
         }
     }, [isConnected, router])
 
+    useEffect(() => {
+        if (solanaWallet.connected && solanaWallet.publicKey) {
+            console.log("Wallet connected:", solanaWallet.publicKey.toString());
+        } else {
+            console.log("Wallet not connected");
+            setMdsBalance(0);
+        }
+    }, [solanaWallet])
+
     // Load MDS balance
     useEffect(() => {
-        if (isConnected && walletAddress) {
+        if (isConnected && walletAddress && solanaWallet.connected && solanaWallet.publicKey) {
             loadMdsBalance()
         }
-    }, [isConnected, walletAddress])
+    }, [isConnected, walletAddress, solanaWallet])
 
     const loadMdsBalance = async () => {
-        if (!walletAddress || !isConnected || !contracts) return
+        if (!solanaWallet.connected || !solanaWallet.publicKey) return
 
         setIsLoadingBalance(true)
         try {
-            const balance = await contracts.medusaShardToken.balanceOf(walletAddress)
-            const balanceFormatted = Number(ethers.formatEther(balance))
-            setMdsBalance(balanceFormatted)
+            // 1️⃣ Get associated token account for user
+            const ata = await getAssociatedTokenAddress(new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"), solanaWallet.publicKey);
+
+            // 2️⃣ Fetch token account info
+            const tokenAccount = await getAccount(connection, ata);
+
+            const decimals = 8;
+
+            const formattedBalance =
+                Number(tokenAccount.amount) / 10 ** decimals;
+            setMdsBalance(formattedBalance)
         } catch (error) {
             console.error("Error loading MDS balance:", error)
         } finally {
@@ -56,79 +90,99 @@ export default function SwapPage() {
         }
     }
 
-    const handleApprove = async () => {
-        if (!swapAmount || Number.parseFloat(swapAmount) <= 0) {
-            toast.error("Please enter a valid amount to swap")
-            return
-        }
-
-        if (Number.parseFloat(swapAmount) > mdsBalance) {
-            toast.error("Insufficient MDS balance")
-            return
-        }
-
-        if (!walletAddress || !contracts) {
-            toast.error("Wallet not connected or contracts not initialized")
-            return
-        }
-
-        setIsApproving(true)
-
-        try {
-            toast.info("Please approve the MDS token transfer in your wallet...")
-
-            // Approve the MDS token transfer
-            const amountWei = ethers.parseEther(swapAmount)
-            const approved = await contracts.medusaShardToken.approve(CONTRACT_ADDRESSES.TOKEN_SWAP, amountWei)
-
-            await approved.wait() // Wait for approval transaction to be confirmed
-            
-            toast.success("MDS token transfer approved!")
-            setIsApproved(true)
-        } catch (error) {
-            console.error("Approval error:", error)
-            if (error.code === 4001) {
-                toast.warning("Approval cancelled by user")
-            } else {
-                toast.error("Approval failed. Please try again.")
-            }
-        } finally {
-            setIsApproving(false)
-        }
-    }
-
     const handleSwap = async () => {
-        if (!isApproved) {
-            toast.error("Please approve the token transfer first")
-            return
-        }
-
         setIsSwapping(true)
 
         try {
-            const amountWei = ethers.parseEther(swapAmount)
-            // Swap MDS tokens for FLOUR Token
-            const tx = await contracts.tokenSwap.swapTokens(amountWei)
-            setTxHash(tx.hash)
+            const TREASURY_WALLET = new PublicKey("uKQ77M8ee7Jq2TKoZSyUUWDbxv9Eva8rv8DZn2DVLXm"); // treasury wallet
+            const TOKEN_MINT_ADDRESS = new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"); // e.g. USDC on Solana
 
+            const amount = Number(swapAmount * 10 ** 8); // Convert to smallest unit (e.g., if 8 decimals)
+
+            if (!solanaWallet.connected || !solanaWallet.publicKey) throw new Error("Solana wallet not connected");
+            if (isNaN(amount) || Number(amount) <= 0) throw new Error("Invalid swap amount");
+
+            const userWallet = solanaWallet.publicKey;
+
+            // Get the associated token accounts for both wallets
+            const userATA = await getAssociatedTokenAddress(
+                TOKEN_MINT_ADDRESS,
+                userWallet
+            );
+
+            const treasuryATA = await getAssociatedTokenAddress(
+                TOKEN_MINT_ADDRESS,
+                TREASURY_WALLET
+            );
+
+            // Create transfer instruction
+            const transferInstruction = createTransferInstruction(
+                userATA,
+                treasuryATA,
+                userWallet,
+                amount
+            );
+
+            // Create transaction and add the transfer instruction
+            const transaction = new Transaction().add(transferInstruction);
+
+            transaction.feePayer = userWallet;
+
+            const latest = await connection.getLatestBlockhash("finalized");
+            transaction.recentBlockhash = latest.blockhash;
+            transaction.lastValidBlockHeight = latest.lastValidBlockHeight;
+
+            if (!transaction || !solanaWallet.signTransaction) {
+                throw new Error("Failed to create transaction or wallet cannot sign");
+            }
+
+            // Sign the transaction
+            const signedTransaction = await solanaWallet.signTransaction(
+                transaction
+            );
+
+            // Send and confirm the transaction
+            const signature = await connection.sendRawTransaction(
+                signedTransaction.serialize()
+            );
+
+            console.log("Transaction successful with signature:", signature);
+            setTxHash(signature)
+            
             toast.success("MDS transfer submitted! Processing swap...")
             setIsProcessing(true)
+            await loadMdsBalance() // Refresh MDS balance
 
-            // Wait for transaction confirmation
-            await tx.wait()
+            // Call backend API to credit FLUOR
+            const response = await fetch("/api/payment/swap", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    playerAddress: walletAddress,
+                    amount: amount,
+                    txHash: signature,
+                }),
+            })
 
-            toast.success(`Successfully swapped ${swapAmount} MDS for ${swapAmount} FLUOR!`)
+            const data = await response.json()
+
+            if (!data.success) {
+                throw new Error(data.message || "Swap API call failed")
+            }
+
+            toast.success(`Successfully swapped ${amount} MDS for ${amount} FLUOR!`)
             setSwapAmount("")
-            setTxHash(tx.hash)
-            setIsApproved(false) // Reset approval state
+            setTxHash(data.signature)
             await loadPlayerData(true) // Refresh FLUOR balance
             await loadMdsBalance() // Refresh MDS balance
         } catch (error) {
-            console.error("Swap error:", error)
-            if (error.code === 4001) {
-                toast.warning("Transaction cancelled by user")
+            console.error("Swap error:", error.message)
+            if (error.message?.includes("User rejected the request.")) {
+                toast.warning("User rejected the request.")
             } else {
-                toast.error("Swap failed. Please try again.")
+                toast.error("Swap failed. Please try again or contact us.")
             }
         } finally {
             setIsSwapping(false)
@@ -181,6 +235,11 @@ export default function SwapPage() {
                                         </p>
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Wallet Connect Button */}
+                            <div className="flex justify-end mb-6">
+                                <WalletMultiButton className="bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:from-[#9945FF]/90 hover:to-[#14F195]/90 justify-center" />
                             </div>
 
                             {/* Current Balances */}
@@ -317,48 +376,23 @@ export default function SwapPage() {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Approve/Swap Buttons */}
-                            {!isApproved ? (
-                                <Button
-                                    onClick={handleApprove}
-                                    disabled={
-                                        !swapAmount ||
-                                        Number.parseFloat(swapAmount) <= 0 ||
-                                        Number.parseFloat(swapAmount) > mdsBalance ||
-                                        isApproving
-                                    }
-                                    className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${
-                                        !swapAmount ||
-                                        Number.parseFloat(swapAmount) <= 0 ||
-                                        Number.parseFloat(swapAmount) > mdsBalance ||
-                                        isApproving
-                                            ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
-                                            : "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white"
+                            <Button
+                                onClick={handleSwap}
+                                disabled={isSwapping || isProcessing || !swapAmount || Number.parseFloat(swapAmount) <= 0 || Number.parseFloat(swapAmount) > mdsBalance || !solanaWallet.connected}
+                                className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${isSwapping || isProcessing
+                                    ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+                                    : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"
                                     }`}
-                                >
-                                    {isApproving ? "Approving..." : "Approve MDS Transfer"}
-                                </Button>
-                            ) : (
-                                <Button
-                                    onClick={handleSwap}
-                                    disabled={isSwapping || isProcessing}
-                                    className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${
-                                        isSwapping || isProcessing
-                                            ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
-                                            : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"
-                                    }`}
-                                >
-                                    {isSwapping ? "Confirming Transaction..." : isProcessing ? "Processing Swap..." : "Swap Tokens"}
-                                </Button>
-                            )}
+                            >
+                                {isSwapping ? "Confirming Transaction..." : isProcessing ? "Processing Swap..." : "Swap Tokens"}
+                            </Button>
 
                             {/* Info Section */}
                             <div className="mt-6 p-4 bg-blue-900/20 rounded-lg border border-blue-500/30">
                                 <h4 className="text-blue-400 font-semibold mb-2">Swap Process:</h4>
                                 <ul className="text-gray-300 text-sm space-y-1">
                                     <li>• Input the amount of MDS you wish to swap</li>
-                                    <li>• Approve the transaction in your wallet</li>
+                                    <li>• Sign the transaction in your wallet</li>
                                     <li>• MDS tokens will be converted to FLUOR at a 1:1 rate</li>
                                     <li>• Use FLUOR to enhance your gaming experience</li>
                                 </ul>

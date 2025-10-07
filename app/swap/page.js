@@ -136,19 +136,22 @@ export default function SwapPage() {
                 throw new Error("Failed to create transaction or wallet cannot sign");
             }
 
-            // Sign the transaction
-            const signedTransaction = await solanaWallet.signTransaction(
-                transaction
-            );
+            const signature = await solanaWallet.sendTransaction(transaction, connection);
+            await connection.confirmTransaction(signature, 'finalized');
 
-            // Send and confirm the transaction
-            const signature = await connection.sendRawTransaction(
-                signedTransaction.serialize()
-            );
+            // // Sign the transaction
+            // const signedTransaction = await solanaWallet.signTransaction(
+            //     transaction
+            // );
+
+            // // Send and confirm the transaction
+            // const signature = await connection.sendRawTransaction(
+            //     signedTransaction.serialize()
+            // );
 
             console.log("Transaction successful with signature:", signature);
             setTxHash(signature)
-            
+
             toast.success("MDS transfer submitted! Processing swap...")
             setIsProcessing(true)
             await loadMdsBalance() // Refresh MDS balance
@@ -161,6 +164,7 @@ export default function SwapPage() {
                 },
                 body: JSON.stringify({
                     playerAddress: walletAddress,
+                    userWallet: userWallet.toString(),
                     amount: amount,
                     txHash: signature,
                 }),
@@ -172,9 +176,9 @@ export default function SwapPage() {
                 throw new Error(data.message || "Swap API call failed")
             }
 
-            toast.success(`Successfully swapped ${amount} MDS for ${amount} FLUOR!`)
+            toast.success(`Successfully swapped ${swapAmount} MDS for ${swapAmount} FLUOR!`)
             setSwapAmount("")
-            setTxHash(data.signature)
+            setTxHash(data.txHash || "")
             await loadPlayerData(true) // Refresh FLUOR balance
             await loadMdsBalance() // Refresh MDS balance
         } catch (error) {

@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { MongoClient } from "mongodb";
 import { CONTRACT_ADDRESSES, FLUORITE_TOKEN_ABI } from "@/utils/contracts";
 
-const MONGO_URI = process.env.MONGO_URI; // e.g., mongodb+srv://user:pass@cluster/dbname
+const MONGO_URI = process.env.MONGO_URI;
 const DB_NAME = "SenkusElixir";
 const COLLECTION_NAME = "swaps";
 
@@ -22,10 +22,12 @@ export async function POST(request) {
       return NextResponse.json({ error: "Invalid request data" }, { status: 400 });
     }
 
-    // Connect to DB and check for existing signature
+    // Connect to DB
     const db = await connectDB();
-    const existingTx = await db.collection(COLLECTION_NAME).findOne({ txHash });
+    const swaps = db.collection(COLLECTION_NAME);
 
+    // Check duplicate
+    const existingTx = await swaps.findOne({ txHash });
     if (existingTx) {
       return NextResponse.json({ error: "Transaction already processed" }, { status: 409 });
     }
@@ -65,7 +67,9 @@ export async function POST(request) {
 
       let uiAmount = null;
       if (tokenAmount) {
-        uiAmount = tokenAmount.uiAmount ?? (tokenAmount.uiAmountString ? Number(tokenAmount.uiAmountString) : null);
+        uiAmount =
+          tokenAmount.uiAmount ??
+          (tokenAmount.uiAmountString ? Number(tokenAmount.uiAmountString) : null);
       }
       if (uiAmount === null && info.amount && typeof info.decimals === "number") {
         uiAmount = Number(info.amount) / Math.pow(10, info.decimals);
@@ -74,10 +78,7 @@ export async function POST(request) {
       return { source, destination, uiAmount, rawInfo: info };
     }
 
-    const candidates = instructions
-      .map(scanParsedInstruction)
-      .filter(Boolean);
-
+    const candidates = instructions.map(scanParsedInstruction).filter(Boolean);
     if (!candidates.length) {
       return NextResponse.json({ error: "No SPL token transfer found" }, { status: 400 });
     }
@@ -91,7 +92,18 @@ export async function POST(request) {
       return NextResponse.json({ error: "Transfer details mismatch" }, { status: 400 });
     }
 
-    // --- Ethereum Transfer ---
+    // --- STEP 1: Insert pending record BEFORE ERC-20 transfer ---
+    const pendingDoc = {
+      txHash,
+      playerAddress,
+      userWallet,
+      amount,
+      status: "pending",
+      createdAt: new Date(),
+    };
+    await swaps.insertOne(pendingDoc);
+
+    // --- STEP 2: Ethereum Transfer ---
     const ETH_RPC_URL = "https://sepolia.base.org";
     const ETH_PRIVATE_KEY = process.env.BACKEND_PRIVATE_KEY;
     const ERC20_CONTRACT_ADDRESS = CONTRACT_ADDRESSES.FLUORITE_TOKEN;
@@ -112,23 +124,41 @@ export async function POST(request) {
       txResponse = await token.transfer(playerAddress, amountToSend);
       const receipt = await txResponse.wait();
 
-      // --- Save txHash and Ethereum tx to MongoDB ---
-      await db.collection(COLLECTION_NAME).insertOne({
-        txHash,
-        ethTxHash: receipt.hash,
-        playerAddress,
-        userWallet,
-        amount,
-        timestamp: new Date(),
-      });
+      // --- STEP 3: Update MongoDB record with ethTxHash ---
+      await swaps.updateOne(
+        { txHash },
+        {
+          $set: {
+            ethTxHash: receipt.hash,
+            status: "completed",
+            completedAt: new Date(),
+          },
+        }
+      );
 
       return NextResponse.json({ success: true, txHash: receipt.hash }, { status: 200 });
     } catch (err) {
       console.error("Failed to send Ethereum transfer:", err);
+
+      // --- STEP 4: Mark failure in DB ---
+      await swaps.updateOne(
+        { txHash },
+        {
+          $set: {
+            status: "failed",
+            error: err.message,
+            failedAt: new Date(),
+          },
+        }
+      );
+
       return NextResponse.json({ error: "Failed to send Ethereum transfer" }, { status: 500 });
     }
   } catch (err) {
     console.error("Error:", err);
-    return NextResponse.json({ error: "Internal Server Error", details: err.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error", details: err.message },
+      { status: 500 }
+    );
   }
 }

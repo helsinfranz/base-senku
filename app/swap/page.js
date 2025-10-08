@@ -369,7 +369,7 @@ export default function SwapPage() {
                                         <div className="flex items-center space-x-2">
                                             {isProcessing && <RefreshCw className="w-4 h-4 text-blue-400 animate-spin" />}
                                             <a
-                                                href={`https://base-sepolia.blockscout.com/tx/${txHash}`}
+                                                href={isProcessing ? `https://explorer.solana.com/tx/${txHash}?cluster=devnet` : `https://base-sepolia.blockscout.com/tx/${txHash}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-blue-400 hover:text-blue-300 transition-colors"

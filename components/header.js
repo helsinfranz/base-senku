@@ -62,7 +62,7 @@ export default function Header() {
             className={`text-sm font-medium transition-colors ${isActivePage("/swap") ? "text-green-400" : "text-white hover:text-green-400"
               }`}
           >
-            Swap
+            Buy
           </Link>
           <Link
             href="/profile"
@@ -165,7 +165,7 @@ export default function Header() {
                 onClick={() => setMobileOpen(false)}
                 className={`px-3 py-2 rounded-md text-sm font-medium ${isActivePage("/swap") ? "text-green-400" : "text-white hover:text-green-400"}`}
               >
-                Swap
+                Buy
               </Link>
               <Link
                 href="/profile"

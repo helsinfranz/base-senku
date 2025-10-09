@@ -96,7 +96,7 @@ export default function HomePage() {
       color: "from-green-500 to-emerald-600",
       items: [
         "Launch of $MDS Token",
-        "$MDS to FLUOR One-Way Swap System",
+        "$MDS to FLUOR Purchase System",
         "Enhanced Gameplay Integration",
         "New Level Additions & User Experience Testing",
       ],
@@ -285,27 +285,27 @@ export default function HomePage() {
                     <ArrowRightLeft className="w-8 h-8 text-indigo-300" />
                   </div>
                   <div>
-                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2">MDS to FLUOR Swap</h3>
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Buy FLUOR</h3>
                     <p className="text-gray-200 text-sm md:text-base">
                       Convert your Medusa Shards (MDS) tokens to FLUOR at a 1:1 ratio
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-col items-center md:items-end space-y-2">
-                  <div className="bg-orange-900/40 rounded-lg px-3 py-1 border border-orange-400/50">
+                  {/* <div className="bg-orange-900/40 rounded-lg px-3 py-1 border border-orange-400/50">
                     <div className="flex items-center space-x-2">
                       <AlertTriangle className="w-4 h-4 text-orange-300" />
                       <span className="text-orange-200 text-sm font-semibold">One-Way Swap</span>
                     </div>
-                  </div>
+                  </div> */}
                   {isConnected ? (
                     <Link href="/swap">
                       <Button className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 shadow-lg">
-                        Swap Tokens
+                        Buy Tokens
                       </Button>
                     </Link>
                   ) : (
-                    <p className="text-gray-300 text-sm">Connect wallet to swap</p>
+                    <p className="text-gray-300 text-sm">Connect wallet to buy</p>
                   )}
                 </div>
               </div>
@@ -459,7 +459,7 @@ export default function HomePage() {
                       <div className="bg-gradient-to-r from-indigo-900/20 to-purple-800/20 rounded-lg p-3 border border-indigo-500/30">
                         <div className="flex items-center space-x-2 mb-1">
                           <div className="text-lg">🔄</div>
-                          <h4 className="text-indigo-400 font-semibold text-sm">Token Swap</h4>
+                          <h4 className="text-indigo-400 font-semibold text-sm">Buy FLUOR</h4>
                         </div>
                         <p className="text-xs text-gray-300">Convert MDS tokens to FLUOR for gameplay</p>
                       </div>
@@ -689,7 +689,7 @@ export default function HomePage() {
                       </span>
                     </summary>
                     <p className="text-gray-300 mt-4">
-                      You can earn FLUOR tokens by completing levels and claiming rewards. New players receive 5 FLUOR tokens to start, and you'll earn more tokens for every 5 levels completed. You can also swap MDS tokens for FLUOR.
+                      You can earn FLUOR tokens by completing levels and claiming rewards. New players receive 5 FLUOR tokens to start, and you'll earn more tokens for every 5 levels completed. You can also buy FLUOR from MDS tokens.
                     </p>
                   </details>
                 </div>

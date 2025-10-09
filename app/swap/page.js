@@ -100,7 +100,7 @@ export default function SwapPage() {
             const amount = Number(swapAmount * 10 ** 8); // Convert to smallest unit (e.g., if 8 decimals)
 
             if (!solanaWallet.connected || !solanaWallet.publicKey) throw new Error("Solana wallet not connected");
-            if (isNaN(amount) || Number(amount) <= 0) throw new Error("Invalid swap amount");
+            if (isNaN(amount) || Number(amount) <= 0) throw new Error("Invalid buy amount");
 
             const userWallet = solanaWallet.publicKey;
 
@@ -221,14 +221,14 @@ export default function SwapPage() {
             <main className="relative z-10 pt-24 pb-8 px-4">
                 <div className="max-w-2xl mx-auto">
                     <div className="text-center mb-8">
-                        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Token Swap</h1>
+                        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Buy FLUOR</h1>
                         <p className="text-gray-400 text-lg">Convert your Medusa Shards (MDS) to FLUOR</p>
                     </div>
 
                     <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50">
                         <CardContent className="p-6 md:p-8">
                             {/* One-way swap notice */}
-                            <div className="bg-yellow-900/20 rounded-lg p-4 mb-6 border border-yellow-500/30">
+                            {/* <div className="bg-yellow-900/20 rounded-lg p-4 mb-6 border border-yellow-500/30">
                                 <div className="flex items-start space-x-3">
                                     <AlertTriangle className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
                                     <div>
@@ -239,7 +239,7 @@ export default function SwapPage() {
                                         </p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Wallet Connect Button */}
                             <div className="flex justify-end mb-6">
@@ -334,7 +334,7 @@ export default function SwapPage() {
                             {/* Swap Details */}
                             {swapAmount && Number.parseFloat(swapAmount) > 0 && (
                                 <div className="bg-gray-800/30 rounded-lg p-4 mt-6 border border-gray-600/30">
-                                    <h3 className="text-white font-semibold mb-3">Swap Details</h3>
+                                    <h3 className="text-white font-semibold mb-3">Purchase Details</h3>
                                     <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
                                             <span className="text-gray-400">Exchange Rate:</span>
@@ -350,7 +350,7 @@ export default function SwapPage() {
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-gray-400">Network Fee:</span>
-                                            <span className="text-gray-400">~$0.01 (Gas)</span>
+                                            <span className="text-gray-400">{"<$0.01 (Gas)"}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -388,14 +388,14 @@ export default function SwapPage() {
                                     : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"
                                     }`}
                             >
-                                {isSwapping ? "Confirming Transaction..." : isProcessing ? "Processing Swap..." : "Swap Tokens"}
+                                {isSwapping ? "Confirming Transaction..." : isProcessing ? "Processing Transaction..." : "Buy Tokens"}
                             </Button>
 
                             {/* Info Section */}
                             <div className="mt-6 p-4 bg-blue-900/20 rounded-lg border border-blue-500/30">
-                                <h4 className="text-blue-400 font-semibold mb-2">Swap Process:</h4>
+                                <h4 className="text-blue-400 font-semibold mb-2">Purchase Process:</h4>
                                 <ul className="text-gray-300 text-sm space-y-1">
-                                    <li>• Input the amount of MDS you wish to swap</li>
+                                    <li>• Input the amount of MDS you wish to spend</li>
                                     <li>• Sign the transaction in your wallet</li>
                                     <li>• MDS tokens will be converted to FLUOR at a 1:1 rate</li>
                                     <li>• Use FLUOR to enhance your gaming experience</li>

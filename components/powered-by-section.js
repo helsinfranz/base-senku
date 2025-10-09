@@ -12,14 +12,20 @@ const PARTNER_LOGOS = [
         height: 60,
     },
     {
+        url: "/brands/solana.png",
+        name: "Solana",
+        width: 140,
+        height: 60,
+    },
+    {
         url: "/brands/base.png",
         name: "Base",
         width: 140,
         height: 60,
     },
     {
-        url: "/brands/virtuals.png",
-        name: "Virtuals",
+        url: "/brands/cyreneai.png",
+        name: "CyreneAI",
         width: 140,
         height: 60,
     },

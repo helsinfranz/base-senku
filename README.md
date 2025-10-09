@@ -27,7 +27,7 @@ Senku's Elixir is an innovative blockchain-based puzzle game that combines strat
 - **Play-to-Earn Mechanics**: Earn FLUOR tokens for completing levels
 - **NFT Integration**: Unlock special Kingdom Blueprint NFTs
 - **Smart Contract Based**: Transparent and secure gameplay mechanics
-- **Web3 Integration**: Built on Base Network
+- **Web3 Integration**: Built on Base Network, Token on Solana
 - **Modern UI**: Built with Next.js and Tailwind CSS
 
 ## 🚀 Getting Started
@@ -93,21 +93,21 @@ Visit http://localhost:3000 to start playing!
 ### MDS Token (Medusa Shards)
 
 - **Type**: DEX Utility Token with swap utility
-- **Standard**: ERC-20
-- **Network**: Base Sepolia
-- **Address**: `0xC50A09C0B9b3357DbEfCB06c219C31FB8e5D5C55`
+- **Standard**: SPL
+- **Network**: Solana
+- **Address**: `Coming Soon`
 - **Use Cases**:
-  - One-way swap to FLUOR (1:1 ratio)
+  - Purchasing FLUOR from $MDS
   - Future ecosystem utility
 
-### Token Swap System
+### Token Purchase System
 
-- **Contract**: `0x5EefdBd62Df837a4FE95D64583C7Ccf0e2ADe49f`
+Buy FLUOR from $MDS in buy section.
 - **Features**:
-  - One-way conversion from MDS to FLUOR
+  - Conversion from MDS to FLUOR
   - 1:1 swap ratio
-  - No swap fees (only network gas)
-  - Two-step process: Approve → Swap
+  - No swap fees (only solana network gas)
+  - One-click process
 
 ## 💎 Tokenomics
 
@@ -125,7 +125,7 @@ Visit http://localhost:3000 to start playing!
 ### Q3 2025 - Economic Expansion
 
 - Launch of $MDS Token
-- $MDS to FLUOR One-Way Swap System
+- $MDS to FLUOR Purchase System
 - Enhanced Gameplay Integration
 - New Level Additions
 
@@ -157,7 +157,7 @@ Visit http://localhost:3000 to start playing!
 
 ## 📝 Smart Contracts
 
-All our smart contracts are deployed on the Base Sepolia Testnet and verified on Blockscout. The game is currently in beta testing phase on testnet before mainnet deployment.
+All our smart contracts are deployed on the Base Sepolia Testnet and verified on Blockscout..
 
 ### FluoriteToken (FLUOR)
 
@@ -168,17 +168,9 @@ All our smart contracts are deployed on the Base Sepolia Testnet and verified on
 
 ### MedusaShardToken (MDS)
 
-- **Contract Address**: `0xC50A09C0B9b3357DbEfCB06c219C31FB8e5D5C55`
-- [View on Basescout](https://base-sepolia.blockscout.com/address/0xC50A09C0B9b3357DbEfCB06c219C31FB8e5D5C55)
-- ERC-20 utility token for Senku's Elixir.
+- **Contract Address**: `Coming Soon`
+- SPL utility token for Senku's Elixir.
 - Future ecosystem utility
-
-### TokenSwap
-
-- **Contract Address**: `0x5EefdBd62Df837a4FE95D64583C7Ccf0e2ADe49f`
-- [View on Basescout](https://base-sepolia.blockscout.com/address/0x5EefdBd62Df837a4FE95D64583C7Ccf0e2ADe49f)
-- One-way swap contract MDS to FLOUR
-- Allows users to swap MDS tokens for FLOUR tokens at a fixed rate
 
 ### KingdomBlueprintNFT (KOSB)
 
@@ -206,14 +198,16 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 💫 Acknowledgments
 
 - Built on Base Network
+- $MDS Token on Solana
 - Inspired by Dr. Stone
 - Powered by modern Web3 technologies
 
 ---
 
 <div align="center">
-  <img src="https://senkuselixir.xyz/brands/base.png" alt="Base Network" height="45"/>
+  <img src="https://senkuselixir.xyz/brands/solana.png" alt="Solana" height="45"/>
   <img src="https://senkuselixir.xyz/brands/dcb.jpg" alt="DCB" height="45"/>
+  <img src="https://senkuselixir.xyz/brands/base.png" alt="Base Network" height="45"/>
+  <img src="https://senkuselixir.xyz/brands/cyreneai.png" alt="CyreneAI" height="45"/>
   <img src="https://senkuselixir.xyz/brands/mds.png" alt="MDS" height="45"/>
-  <img src="https://senkuselixir.xyz/brands/virtuals.png" alt="Virtuals" height="45"/>
 </div>

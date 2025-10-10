@@ -91,7 +91,7 @@ export default function HomePage() {
   // Roadmap phases
   const roadmapPhases = [
     {
-      quarter: "Q3 2025",
+      quarter: "Q4 2025",
       phase: "PHASE 1: ECONOMIC EXPANSION",
       color: "from-green-500 to-emerald-600",
       items: [
@@ -102,7 +102,7 @@ export default function HomePage() {
       ],
     },
     {
-      quarter: "Q4 2025",
+      quarter: "Q1 2026",
       phase: "PHASE 2: THE FORGE CREATION",
       color: "from-blue-500 to-cyan-600",
       items: [
@@ -113,18 +113,18 @@ export default function HomePage() {
       ],
     },
     {
-      quarter: "Q1 2026",
+      quarter: "Q2 2026",
       phase: "PHASE 3: COMPETITIVE ECOSYSTEM",
       color: "from-purple-500 to-violet-600",
       items: [
         "Global Leaderboard System",
         "High-Ranking Player Rewards",
-        "FLUOR-Based DAO Governance",
+        "MDS-Based DAO Governance",
         "FORGE NFT Utility Expansion",
       ],
     },
     {
-      quarter: "Q2 2026",
+      quarter: "Q3 2026",
       phase: "PHASE 4: ARC SEASONS & STONE WORLD",
       color: "from-orange-500 to-red-600",
       items: [
@@ -136,12 +136,12 @@ export default function HomePage() {
       ],
     },
     {
-      quarter: "Q3 2026",
+      quarter: "Q4 2026",
       phase: "PHASE 5: COMMUNITY MARKETPLACE",
       color: "from-pink-500 to-rose-600",
       items: [
         "In-Game Store System Launch",
-        "FLUOR & MDS Token Item Purchases",
+        "MDS Token Item Purchases",
         "DAO-Governed Item Catalog",
         "Community-Driven Store Features",
         "Premium Cosmetics & Utility Items",
@@ -250,7 +250,7 @@ export default function HomePage() {
             <Card className="bg-gray-900/40 backdrop-blur-md border border-gray-700/30 hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105">
               <CardContent className="p-4 md:p-6 text-center">
                 <Beaker className="w-8 h-8 md:w-12 md:h-12 text-blue-400 mx-auto mb-3 md:mb-4" />
-                <h3 className="text-white font-semibold text-sm md:text-base mb-2">FLUOR Tokens</h3>
+                <h3 className="text-white font-semibold text-sm md:text-base mb-2">FLUOR</h3>
                 <p className="text-gray-400 text-xs md:text-sm">
                   Earn tokens for successful experiments and discoveries
                 </p>
@@ -355,7 +355,7 @@ export default function HomePage() {
                   <div>
                     <h3 className="text-lg md:text-xl font-semibold text-blue-400 mb-4 flex items-center">
                       <Gem className="w-5 h-5 mr-2" />
-                      Token Economics
+                      FLUOR Economics
                     </h3>
                     <div className="space-y-3">
                       <div className="bg-gradient-to-r from-green-900/30 to-green-800/30 rounded-lg p-4 border border-green-500/30">
@@ -546,7 +546,7 @@ export default function HomePage() {
           </Card>
 
           {/* Tokenomics Section */}
-          <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50 mb-12 md:mb-16">
+          {/* <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50 mb-12 md:mb-16">
             <CardContent className="p-6 md:p-8">
               <div className="text-center mb-8 md:mb-12">
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center justify-center">
@@ -557,7 +557,6 @@ export default function HomePage() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                {/* Pie Chart */}
                 <div className="flex justify-center">
                   <div className="relative w-80 h-80">
                     <svg viewBox="0 0 200 200" className="w-full h-full transform -rotate-90">
@@ -595,7 +594,6 @@ export default function HomePage() {
                       })}
                     </svg>
 
-                    {/* Center circle */}
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="bg-gray-900 rounded-full w-24 h-24 flex items-center justify-center border-4 border-gray-700">
                         <Coins className="w-8 h-8 text-yellow-400" />
@@ -604,7 +602,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Legend */}
                 <div className="space-y-4">
                   {tokenomicsData.map((segment, index) => (
                     <div
@@ -632,7 +629,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Additional Info */}
               <div className="mt-8 pt-6 border-t border-gray-700/50">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-gradient-to-r from-green-900/20 to-green-800/20 rounded-lg p-4 border border-green-500/30 text-center">
@@ -655,7 +651,7 @@ export default function HomePage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* FAQ Section */}
           <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50 mb-12">

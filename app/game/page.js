@@ -21,7 +21,7 @@ function GameArenaContent() {
     claimReward,
     unlockNft,
     loadPlayerData,
-    walletAddress,
+    ethAddress,
   } = useWallet()
   const toast = useToast()
 
@@ -93,7 +93,7 @@ function GameArenaContent() {
   const loadLevel = async (levelId) => {
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/game/level/${levelId}?playerAddress=${walletAddress}`)
+      const response = await fetch(`/api/game/level/${levelId}?playerAddress=${ethAddress}`)
       const data = await response.json()
 
       if (data.success) {
@@ -141,7 +141,7 @@ function GameArenaContent() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          playerAddress: walletAddress,
+          playerAddress: ethAddress,
           tubes: tubes,
           levelId: currentLevelId,
         }),

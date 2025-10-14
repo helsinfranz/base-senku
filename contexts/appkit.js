@@ -1,11 +1,10 @@
 "use client"
 
 import { createAppKit } from "@reown/appkit/react";
-import { EthersAdapter } from "@reown/appkit-adapter-ethers";
-import { baseSepolia } from "@reown/appkit/networks";
-import { WalletProvider } from "@/contexts/wallet-context"
-
-const projectId = "21bb9c0171a2f74f3e49b81e06e26220";
+import { SolanaAdapter } from "@reown/appkit-adapter-solana/react";
+import { solana } from "@reown/appkit/networks";
+import { WalletProvider } from "@/contexts/wallet-context";
+// import { ReownAuthentication } from '@reown/appkit-siwx';
 
 const metadata = {
     name: "Senku's Elixir",
@@ -15,13 +14,14 @@ const metadata = {
 };
 
 createAppKit({
-    adapters: [new EthersAdapter()],
+    adapters: [new SolanaAdapter()],
     metadata: metadata,
-    networks: [baseSepolia],
-    projectId: projectId,
+    networks: [solana],
+    projectId: "21bb9c0171a2f74f3e49b81e06e26220",
     features: {
         analytics: true,
     },
+    // siwx: new ReownAuthentication()
 });
 
 export function AppKit({ children }) {

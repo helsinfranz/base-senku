@@ -1,10 +1,11 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect } from "react"
-import { getContracts, getReadOnlyContracts, getSigner, getReadProvider } from "@/utils/contracts"
+import { getReadOnlyContracts, getReadProvider } from "@/utils/contracts"
 import { useAppKit, useAppKitState } from "@reown/appkit/react";
 import { useAppKitAccount, useDisconnect } from "@reown/appkit/react";
-import { useAppKitProvider } from "@reown/appkit/react";
+// import { useAppKitProvider } from "@reown/appkit/react";
+// import { useAppKitSIWX } from '@reown/appkit-siwx/react'
 
 const WalletContext = createContext()
 
@@ -20,13 +21,17 @@ export function WalletProvider({ children }) {
   const [walletAddress, setWalletAddress] = useState("")
   const [fluorBalance, setFluorBalance] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
-  const [contracts, setContracts] = useState(null)
   const [nftCount, setNftCount] = useState(0)
-  const { walletProvider } = useAppKitProvider("eip155");
+  const [ethAddress, setEthAddress] = useState(null)
+  // const [sessionAccount, setSessionAccount] = useState(null)
+  // const { walletProvider } = useAppKitProvider("solana");
   const { address, isConnected } = useAppKitAccount();
   const { disconnect } = useDisconnect();
   const { loading } = useAppKitState();
   const { open } = useAppKit();
+  // const siwx = useAppKitSIWX();
+
+  // console.log("Session Account:", sessionAccount);
 
   useEffect(() => {
     setIsConnecting(loading)
@@ -36,23 +41,47 @@ export function WalletProvider({ children }) {
     if (address && isConnected) {
       setWalletAddress(address)
       initializeContracts()
+      loadUserWallet()
     }
   }, [address, isConnected])
 
+  // useEffect(() => {
+  //   if (!siwx) return
+
+  //   siwx.getSessionAccount().then(setSessionAccount)
+  // }, [siwx])
+
   useEffect(() => {
-    if (isConnected && address && walletAddress && contracts && readOnlyContracts) {
+    if (isConnected && address && walletAddress && readOnlyContracts && ethAddress) {
       loadPlayerData()
     }
-  }, [isConnected, address, walletAddress, contracts, readOnlyContracts])
+  }, [isConnected, address, walletAddress, readOnlyContracts, ethAddress])
+
+  const loadUserWallet = async () => {
+    if (!address) return
+    const res = await fetch("/api/keys/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ solanaAddress: address }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      console.log("Derived ETH Address:", data.ethAddress);
+      setEthAddress(data.ethAddress);
+    } else {
+      console.log("No derived key found for this Solana address.")
+    }
+  }
 
   const initializeContracts = async () => {
     try {
-      const signer = await getSigner(walletProvider)
+      // const signer = await getSigner(walletProvider)
       const readProvider = getReadProvider()
-      if (signer && readProvider) {
-        const contractInstances = getContracts(signer)
+      if (readProvider) {
+        // if (signer && readProvider) {
+        // const contractInstances = getContracts(signer)
         const contractReadOnlyInstances = getReadOnlyContracts(readProvider)
-        setContracts(contractInstances)
+        // setContracts(contractInstances)
         setReadOnlyContracts(contractReadOnlyInstances)
       }
     } catch (error) {
@@ -61,7 +90,7 @@ export function WalletProvider({ children }) {
   }
 
   const loadPlayerData = async (forceRefresh = false) => {
-    if (!contracts || !readOnlyContracts || !walletAddress) return
+    if (!readOnlyContracts || !walletAddress || !ethAddress) return
 
     setIsLoading(true)
     try {
@@ -70,7 +99,7 @@ export function WalletProvider({ children }) {
         await new Promise((resolve) => setTimeout(resolve, 2000))
       }
 
-      const playerInfo = await readOnlyContracts.gameController.getPlayerInfo(walletAddress)
+      const playerInfo = await readOnlyContracts.gameController.getPlayerInfo(ethAddress)
 
       const fluorBalanceWei = Number(playerInfo.fluorBalance)
       const fluorBalanceEther = fluorBalanceWei / 1e18
@@ -106,14 +135,15 @@ export function WalletProvider({ children }) {
     fluorBalance,
     nftCount,
     playerData,
-    contracts,
     readOnlyContracts,
     isLoading,
+    ethAddress,
     loadPlayerData,
     connectWallet: async () => {
       setIsConnecting(true)
       try {
-        await open({ view: "Connect", namespace: "eip155" })
+        await open();
+        // await open({ view: "Connect" })
       } catch (error) {
         console.error("Error connecting wallet:", error)
         setIsConnecting(false)
@@ -131,14 +161,13 @@ export function WalletProvider({ children }) {
           claimableRewardSets: 0,
           hasClaimedInitialTokens: false,
         })
-        setContracts(null)
         setReadOnlyContracts(null)
       } catch (error) {
         console.error("Error disconnecting wallet:", error)
       }
     },
     claimInitialTokens: async () => {
-      if (!contracts || !walletAddress || !readOnlyContracts) {
+      if (!walletAddress || !readOnlyContracts) {
         console.error("Contracts not initialized")
         return false
       }
@@ -147,11 +176,11 @@ export function WalletProvider({ children }) {
         setIsLoading(true)
         console.log("Claiming initial tokens...")
 
-        const tx = await contracts.gameController.claimInitialTokens()
-        console.log("Transaction sent:", tx.hash)
-
-        const receipt = await tx.wait()
-        console.log("Transaction confirmed:", receipt)
+        await fetch("/api/set/claimInitial", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ solanaAddress: address }),
+        }).then(r => r.json());
 
         // Update player data immediately to reflect the change
         setPlayerData((prev) => ({
@@ -181,14 +210,16 @@ export function WalletProvider({ children }) {
       }
     },
     payToPlay: async () => {
-      if (!contracts || !walletAddress || !readOnlyContracts) return false
+      if (!walletAddress || !readOnlyContracts) return false
 
       try {
         setIsLoading(true)
 
-        // Then pay to play
-        const tx = await contracts.gameController.payToPlay()
-        await tx.wait()
+        await fetch("/api/set/payToPlay", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ solanaAddress: address }),
+        }).then(r => r.json());
         await loadPlayerData(true) // Force refresh after payment
         return true
       } catch (error) {
@@ -199,12 +230,16 @@ export function WalletProvider({ children }) {
       }
     },
     claimReward: async () => {
-      if (!contracts || !walletAddress || !readOnlyContracts) return false
+      if (!walletAddress || !readOnlyContracts) return false
 
       try {
         setIsLoading(true)
-        const tx = await contracts.gameController.claimReward()
-        await tx.wait()
+
+        await fetch("/api/set/claimReward", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ solanaAddress: address }),
+        }).then(r => r.json());
         await loadPlayerData(true) // Force refresh after claiming
         return true
       } catch (error) {
@@ -215,12 +250,17 @@ export function WalletProvider({ children }) {
       }
     },
     unlockNft: async () => {
-      if (!contracts || !readOnlyContracts || !walletAddress) return false
+      if (!readOnlyContracts || !walletAddress) return false
 
       try {
         setIsLoading(true)
-        const tx = await contracts.gameController.unlockNft()
-        await tx.wait()
+
+        await fetch("/api/set/unlockNft", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ solanaAddress: address }),
+        }).then(r => r.json());
+
         await loadPlayerData(true) // Force refresh after NFT unlock
         return true
       } catch (error) {

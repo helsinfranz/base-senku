@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { useWallet } from "@/contexts/wallet-context"
 
 function ProfileContent() {
-  const { walletAddress, fluorBalance, nftCount, playerData, isLoading } = useWallet()
+  const { walletAddress, fluorBalance, ethAddress, nftCount, playerData, isLoading } = useWallet()
 
   // Remove the mock NFT state and replace with dynamic NFT generation
   const generateNftData = (count) => {
@@ -101,6 +101,13 @@ function ProfileContent() {
                       {playerData.currentLevel > 0 ? playerData.currentLevel : "Ready for Next"}
                     </p>
                   </div>
+                  {/* <div>
+                    <p className="text-gray-400 text-xs md:text-sm">Binded Address</p>
+                    <p className="text-white font-mono text-sm md:text-lg break-all">
+                      {ethAddress && ethAddress.length > 10 ?
+                        ethAddress : ""}
+                    </p>
+                  </div> */}
                   <div>
                     <p className="text-gray-400 text-xs md:text-sm">Claimable Rewards</p>
                     <p className="text-orange-400 font-bold text-lg">{playerData.claimableRewardSets} Sets</p>

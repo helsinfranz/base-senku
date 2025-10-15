@@ -5,7 +5,7 @@ import { getReadOnlyContracts, getReadProvider } from "@/utils/contracts"
 import { useAppKit, useAppKitState } from "@reown/appkit/react";
 import { useAppKitAccount, useDisconnect } from "@reown/appkit/react";
 // import { useAppKitProvider } from "@reown/appkit/react";
-// import { useAppKitSIWX } from '@reown/appkit-siwx/react'
+import { useAppKitSIWX } from '@reown/appkit-siwx/react'
 
 const WalletContext = createContext()
 
@@ -23,15 +23,14 @@ export function WalletProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false)
   const [nftCount, setNftCount] = useState(0)
   const [ethAddress, setEthAddress] = useState(null)
-  // const [sessionAccount, setSessionAccount] = useState(null)
-  // const { walletProvider } = useAppKitProvider("solana");
+  const [sessionAccount, setSessionAccount] = useState(null)
   const { address, isConnected } = useAppKitAccount();
   const { disconnect } = useDisconnect();
   const { loading } = useAppKitState();
   const { open } = useAppKit();
-  // const siwx = useAppKitSIWX();
+  const siwx = useAppKitSIWX();
 
-  // console.log("Session Account:", sessionAccount);
+  console.log("Session Account:", sessionAccount);
 
   useEffect(() => {
     setIsConnecting(loading)
@@ -39,17 +38,22 @@ export function WalletProvider({ children }) {
 
   useEffect(() => {
     if (address && isConnected) {
+      // open({ view: "Networks" })
       setWalletAddress(address)
       initializeContracts()
       loadUserWallet()
     }
   }, [address, isConnected])
 
-  // useEffect(() => {
-  //   if (!siwx) return
-
-  //   siwx.getSessionAccount().then(setSessionAccount)
-  // }, [siwx])
+  useEffect(() => {
+    if (siwx && isConnected && address) {
+      try {
+        siwx.getSessionAccount().then(setSessionAccount)
+      } catch (error) {
+        console.error("Error getting session account:", error)
+      }
+    }
+  }, [siwx, isConnected, address])
 
   useEffect(() => {
     if (isConnected && address && walletAddress && readOnlyContracts && ethAddress) {
@@ -75,13 +79,9 @@ export function WalletProvider({ children }) {
 
   const initializeContracts = async () => {
     try {
-      // const signer = await getSigner(walletProvider)
       const readProvider = getReadProvider()
       if (readProvider) {
-        // if (signer && readProvider) {
-        // const contractInstances = getContracts(signer)
         const contractReadOnlyInstances = getReadOnlyContracts(readProvider)
-        // setContracts(contractInstances)
         setReadOnlyContracts(contractReadOnlyInstances)
       }
     } catch (error) {

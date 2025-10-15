@@ -6,15 +6,14 @@ import Header from "@/components/header"
 import ParticleBackground from "@/components/particle-background"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowDownUp, ExternalLink, RefreshCw, AlertTriangle } from "lucide-react"
+import { ArrowDownUp, ExternalLink, RefreshCw } from "lucide-react"
 import { useWallet } from "@/contexts/wallet-context"
 import { useToast } from "@/components/toast"
 import Image from "next/image"
 
 // Solana Imports
 
-import { useWallet as useSolanaWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useAppKitConnection, useAppKitProvider } from '@reown/appkit/react'
 import {
     Connection,
     PublicKey,
@@ -27,15 +26,14 @@ import {
 } from "@solana/spl-token";
 
 export default function SwapPage() {
-    const solanaWallet = useSolanaWallet();
+    const solanaWallet = useAppKitProvider('solana').walletProvider
 
-    // Solana Wallet Context Above.
-
-    const { isConnected, walletAddress, fluorBalance, loadPlayerData } = useWallet()
+    const { isConnected, walletAddress, fluorBalance, loadPlayerData, ethAddress } = useWallet()
     const router = useRouter()
     const toast = useToast()
 
-    const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+    const { connection } = useAppKitConnection({ namespace: 'solana' })
+    console.log(connection)
 
     const [swapAmount, setSwapAmount] = useState("")
     const [isSwapping, setIsSwapping] = useState(false)
@@ -51,29 +49,22 @@ export default function SwapPage() {
         }
     }, [isConnected, router])
 
-    useEffect(() => {
-        if (solanaWallet.connected && solanaWallet.publicKey) {
-            console.log("Wallet connected:", solanaWallet.publicKey.toString());
-        } else {
-            console.log("Wallet not connected");
-            setMdsBalance(0);
-        }
-    }, [solanaWallet])
-
     // Load MDS balance
     useEffect(() => {
-        if (isConnected && walletAddress && solanaWallet.connected && solanaWallet.publicKey) {
+        if (isConnected && walletAddress && ethAddress) {
             loadMdsBalance()
         }
-    }, [isConnected, walletAddress, solanaWallet])
+    }, [isConnected, walletAddress, ethAddress])
 
     const loadMdsBalance = async () => {
-        if (!solanaWallet.connected || !solanaWallet.publicKey) return
+        if (!ethAddress || !walletAddress) return
 
         setIsLoadingBalance(true)
         try {
+            const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+
             // 1️⃣ Get associated token account for user
-            const ata = await getAssociatedTokenAddress(new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"), solanaWallet.publicKey);
+            const ata = await getAssociatedTokenAddress(new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"), new PublicKey(walletAddress));
 
             // 2️⃣ Fetch token account info
             const tokenAccount = await getAccount(connection, ata);
@@ -94,12 +85,13 @@ export default function SwapPage() {
         setIsSwapping(true)
 
         try {
+            if (!solanaWallet.publicKey || !ethAddress) throw new Error("Reconnect Wallet");
             const TREASURY_WALLET = new PublicKey("uKQ77M8ee7Jq2TKoZSyUUWDbxv9Eva8rv8DZn2DVLXm"); // treasury wallet
             const TOKEN_MINT_ADDRESS = new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"); // e.g. USDC on Solana
 
             const amount = Number(swapAmount * 10 ** 8); // Convert to smallest unit (e.g., if 8 decimals)
 
-            if (!solanaWallet.connected || !solanaWallet.publicKey) throw new Error("Solana wallet not connected");
+            if (!solanaWallet.publicKey) throw new Error("Solana wallet not connected");
             if (isNaN(amount) || Number(amount) <= 0) throw new Error("Invalid buy amount");
 
             const userWallet = solanaWallet.publicKey;
@@ -127,10 +119,7 @@ export default function SwapPage() {
             const transaction = new Transaction().add(transferInstruction);
 
             transaction.feePayer = userWallet;
-
-            const latest = await connection.getLatestBlockhash("finalized");
-            transaction.recentBlockhash = latest.blockhash;
-            transaction.lastValidBlockHeight = latest.lastValidBlockHeight;
+            transaction.recentBlockhash = (await connection.getLatestBlockhash('confirmed')).blockhash
 
             if (!transaction || !solanaWallet.signTransaction) {
                 throw new Error("Failed to create transaction or wallet cannot sign");
@@ -163,7 +152,7 @@ export default function SwapPage() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    playerAddress: walletAddress,
+                    playerAddress: ethAddress,
                     userWallet: userWallet.toString(),
                     amount: amount,
                     txHash: signature,
@@ -242,9 +231,9 @@ export default function SwapPage() {
                             </div> */}
 
                             {/* Wallet Connect Button */}
-                            <div className="flex justify-end mb-6">
+                            {/* <div className="flex justify-end mb-6">
                                 <WalletMultiButton className="bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:from-[#9945FF]/90 hover:to-[#14F195]/90 justify-center" />
-                            </div>
+                            </div> */}
 
                             {/* Current Balances */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -382,7 +371,7 @@ export default function SwapPage() {
                             )}
                             <Button
                                 onClick={handleSwap}
-                                disabled={isSwapping || isProcessing || !swapAmount || Number.parseFloat(swapAmount) <= 0 || Number.parseFloat(swapAmount) > mdsBalance || !solanaWallet.connected}
+                                disabled={isSwapping || isProcessing || !swapAmount || Number.parseFloat(swapAmount) <= 0 || Number.parseFloat(swapAmount) > mdsBalance || !solanaWallet.publicKey || !ethAddress}
                                 className={`w-full text-lg py-3 mt-6 font-semibold rounded-lg transition-all duration-300 ${isSwapping || isProcessing
                                     ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
                                     : "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white"

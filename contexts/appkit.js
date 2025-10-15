@@ -2,9 +2,17 @@
 
 import { createAppKit } from "@reown/appkit/react";
 import { SolanaAdapter } from "@reown/appkit-adapter-solana/react";
-import { solana } from "@reown/appkit/networks";
+import { solana, solanaDevnet } from "@reown/appkit/networks";
 import { WalletProvider } from "@/contexts/wallet-context";
-// import { ReownAuthentication } from '@reown/appkit-siwx';
+import { ReownAuthentication } from '@reown/appkit-siwx';
+
+const solanaWeb3JsAdapter = new SolanaAdapter();
+
+const projectId = "21bb9c0171a2f74f3e49b81e06e26220";
+
+if (!projectId) {
+    throw new Error('Project ID is not defined')
+}
 
 const metadata = {
     name: "Senku's Elixir",
@@ -14,14 +22,14 @@ const metadata = {
 };
 
 createAppKit({
-    adapters: [new SolanaAdapter()],
-    metadata: metadata,
+    adapters: [solanaWeb3JsAdapter],
+    projectId,
     networks: [solana],
-    projectId: "21bb9c0171a2f74f3e49b81e06e26220",
+    metadata,
     features: {
         analytics: true,
     },
-    // siwx: new ReownAuthentication()
+    siwx: new ReownAuthentication()
 });
 
 export function AppKit({ children }) {

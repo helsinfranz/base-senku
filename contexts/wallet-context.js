@@ -30,8 +30,6 @@ export function WalletProvider({ children }) {
   const { open } = useAppKit();
   const siwx = useAppKitSIWX();
 
-  console.log("Session Account:", sessionAccount);
-
   useEffect(() => {
     setIsConnecting(loading)
   }, [loading])
@@ -176,11 +174,20 @@ export function WalletProvider({ children }) {
         setIsLoading(true)
         console.log("Claiming initial tokens...")
 
-        await fetch("/api/set/claimInitial", {
+        const storedKey = localStorage.getItem("@appkit/siwx-auth-token");
+        if (!storedKey) {
+          console.error("No auth key found for this Solana address.");
+        }
+
+        const res = await fetch("/api/set/claimInitial", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ solanaAddress: address }),
-        }).then(r => r.json());
+          body: JSON.stringify({ solanaAddress: address, token: storedKey }),
+        })
+        if (!res.ok) {
+          throw new Error("Failed to claim initial tokens")
+        }
+        await res.json();
 
         // Update player data immediately to reflect the change
         setPlayerData((prev) => ({
@@ -215,11 +222,20 @@ export function WalletProvider({ children }) {
       try {
         setIsLoading(true)
 
-        await fetch("/api/set/payToPlay", {
+        const storedKey = localStorage.getItem("@appkit/siwx-auth-token");
+        if (!storedKey) {
+          console.error("No auth key found for this Solana address.");
+        }
+
+        const res = await fetch("/api/set/payToPlay", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ solanaAddress: address }),
-        }).then(r => r.json());
+          body: JSON.stringify({ solanaAddress: address, token: storedKey }),
+        });
+        if (!res.ok) {
+          throw new Error("Failed to pay to play")
+        }
+        await res.json();
         await loadPlayerData(true) // Force refresh after payment
         return true
       } catch (error) {
@@ -235,11 +251,19 @@ export function WalletProvider({ children }) {
       try {
         setIsLoading(true)
 
-        await fetch("/api/set/claimReward", {
+        const storedKey = localStorage.getItem("@appkit/siwx-auth-token");
+        if (!storedKey) {
+          console.error("No auth key found for this Solana address.");
+        }
+        const res = await fetch("/api/set/claimReward", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ solanaAddress: address }),
-        }).then(r => r.json());
+          body: JSON.stringify({ solanaAddress: address, token: storedKey }),
+        })
+        if (!res.ok) {
+          throw new Error("Failed to claim reward")
+        }
+        await res.json();
         await loadPlayerData(true) // Force refresh after claiming
         return true
       } catch (error) {
@@ -255,11 +279,19 @@ export function WalletProvider({ children }) {
       try {
         setIsLoading(true)
 
-        await fetch("/api/set/unlockNft", {
+        const storedKey = localStorage.getItem("@appkit/siwx-auth-token");
+        if (!storedKey) {
+          console.error("No auth key found for this Solana address.");
+        }
+        const res = await fetch("/api/set/unlockNft", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ solanaAddress: address }),
-        }).then(r => r.json());
+          body: JSON.stringify({ solanaAddress: address, token: storedKey }),
+        })
+        if (!res.ok) {
+          throw new Error("Failed to unlock NFT")
+        }
+        await res.json();
 
         await loadPlayerData(true) // Force refresh after NFT unlock
         return true

@@ -2,7 +2,7 @@
 
 import { createAppKit } from "@reown/appkit/react";
 import { SolanaAdapter } from "@reown/appkit-adapter-solana/react";
-import { solana, solanaDevnet } from "@reown/appkit/networks";
+import { solana } from "@reown/appkit/networks";
 import { WalletProvider } from "@/contexts/wallet-context";
 import { ReownAuthentication } from '@reown/appkit-siwx';
 

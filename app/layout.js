@@ -3,7 +3,6 @@ import "./globals.css"
 import { ToastProvider } from "@/components/toast"
 import { AppKit } from "../contexts/appkit"
 import { Analytics } from "@vercel/analytics/next"
-import { SolanaProvider } from "@/components/solana-provider"
 
 const APP_NAME = "Senku's Elixir - Kingdom of Science";
 const APP_DEFAULT_TITLE = "Senku's Elixir - Kingdom of Science";
@@ -56,12 +55,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SolanaProvider>
           <AppKit>
             <ToastProvider>{children}</ToastProvider>
             <Analytics />
           </AppKit>
-        </SolanaProvider>
       </body>
     </html >
   )

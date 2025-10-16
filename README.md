@@ -19,7 +19,7 @@
 
 ## 📖 About
 
-Senku's Elixir is an innovative blockchain-based puzzle game that combines strategic thinking with Web3 mechanics. Players solve increasingly challenging tube puzzles while earning FLUOR tokens and collecting unique Kingdom Blueprint NFTs.
+Senku's Elixir is an innovative blockchain-based puzzle game that combines strategic thinking with Web3 mechanics. Players solve increasingly challenging tube puzzles while earning FLUOR tokens and collecting unique Blueprint NFTs.
 
 ## ✨ Features
 

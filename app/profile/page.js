@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { useWallet } from "@/contexts/wallet-context"
 
 function ProfileContent() {
-  const { walletAddress, fluorBalance, nftCount, playerData, isLoading } = useWallet()
+  const { walletAddress, fluorBalance, ethAddress, nftCount, playerData, isLoading } = useWallet()
 
   // Remove the mock NFT state and replace with dynamic NFT generation
   const generateNftData = (count) => {
@@ -72,10 +72,10 @@ function ProfileContent() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
                 <div>
                   <p className="text-gray-400 text-xs md:text-sm">Scientist ID</p>
-                  <p className="text-white font-mono text-sm md:text-lg break-all">
-                    {walletAddress && walletAddress.length > 10
-                      ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-                      : walletAddress}
+                  <p className="text-white font-mono text-sm md:text-lg break-all" title="Copy Binding Address" onClick={() => navigator?.clipboard?.writeText(ethAddress || "")}>
+                    {ethAddress && ethAddress.length > 10
+                      ? `${ethAddress.slice(0, 6)}...${ethAddress.slice(-4)}`
+                      : ethAddress}
                   </p>
                 </div>
                 <div>

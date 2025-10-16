@@ -18,12 +18,6 @@ const PARTNER_LOGOS = [
         height: 60,
     },
     {
-        url: "/brands/base.png",
-        name: "Base",
-        width: 140,
-        height: 60,
-    },
-    {
         url: "/brands/cyreneai.png",
         name: "CyreneAI",
         width: 140,
@@ -32,6 +26,12 @@ const PARTNER_LOGOS = [
     {
         url: "/brands/mds.png",
         name: "$MDS",
+        width: 140,
+        height: 60,
+    },
+    {
+        url: "/brands/reown.png",
+        name: "Reown",
         width: 140,
         height: 60,
     },
@@ -133,8 +133,8 @@ export default function PoweredBySection() {
                             key={index}
                             onClick={() => setCurrentIndex(index)}
                             className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex
-                                    ? "bg-gradient-to-r from-green-400 to-blue-400 scale-125"
-                                    : "bg-gray-600 hover:bg-gray-500"
+                                ? "bg-gradient-to-r from-green-400 to-blue-400 scale-125"
+                                : "bg-gray-600 hover:bg-gray-500"
                                 }`}
                         />
                     ))}

@@ -270,8 +270,8 @@ export default function HomePage() {
             <Card className="bg-gray-900/40 backdrop-blur-md border border-gray-700/30 hover:border-yellow-500/50 transition-all duration-300 transform hover:scale-105">
               <CardContent className="p-4 md:p-6 text-center">
                 <Zap className="w-8 h-8 md:w-12 md:h-12 text-yellow-400 mx-auto mb-3 md:mb-4" />
-                <h3 className="text-white font-semibold text-sm md:text-base mb-2">Base Network</h3>
-                <p className="text-gray-400 text-xs md:text-sm">Built on Base Sepolia for fast, secure transactions</p>
+                <h3 className="text-white font-semibold text-sm md:text-base mb-2">Solana Network</h3>
+                <p className="text-gray-400 text-xs md:text-sm">Built on Solana for fast, secure transactions</p>
               </CardContent>
             </Card>
           </div>
@@ -478,7 +478,7 @@ export default function HomePage() {
                   </p>
                   <div className="flex items-center justify-center space-x-2 text-xs text-gray-400">
                     <Zap className="w-4 h-4 text-yellow-400" />
-                    <span>Powered by Base Sepolia Network</span>
+                    <span>Powered by Solana</span>
                   </div>
                 </div>
               </div>

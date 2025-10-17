@@ -13,9 +13,9 @@ import Image from "next/image"
 
 // Solana Imports
 
-import { useAppKitConnection, useAppKitProvider } from '@reown/appkit/react'
+import { useAppKitProvider } from '@reown/appkit/react'
+import { useAppKitConnection } from '@reown/appkit-adapter-solana/react'
 import {
-    Connection,
     PublicKey,
     Transaction,
 } from "@solana/web3.js";
@@ -32,8 +32,7 @@ export default function SwapPage() {
     const router = useRouter()
     const toast = useToast()
 
-    const { connection } = useAppKitConnection({ namespace: 'solana' })
-    console.log(connection)
+    const { connection } = useAppKitConnection()
 
     const [swapAmount, setSwapAmount] = useState("")
     const [isSwapping, setIsSwapping] = useState(false)
@@ -61,15 +60,14 @@ export default function SwapPage() {
 
         setIsLoadingBalance(true)
         try {
-            const connection = new Connection("https://api.devnet.solana.com", "confirmed");
-
             // 1️⃣ Get associated token account for user
-            const ata = await getAssociatedTokenAddress(new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"), new PublicKey(walletAddress));
+            // const ata = await getAssociatedTokenAddress(new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"), new PublicKey(walletAddress));
+            const ata = await getAssociatedTokenAddress(new PublicKey("HwPtbFpd3VTe3tfyosoVtPf9WPuSk5gAKkN5xp6Npump"), new PublicKey(walletAddress));
 
             // 2️⃣ Fetch token account info
             const tokenAccount = await getAccount(connection, ata);
 
-            const decimals = 8;
+            const decimals = 6;
 
             const formattedBalance =
                 Number(tokenAccount.amount) / 10 ** decimals;
@@ -87,7 +85,8 @@ export default function SwapPage() {
         try {
             if (!solanaWallet.publicKey || !ethAddress) throw new Error("Reconnect Wallet");
             const TREASURY_WALLET = new PublicKey("uKQ77M8ee7Jq2TKoZSyUUWDbxv9Eva8rv8DZn2DVLXm"); // treasury wallet
-            const TOKEN_MINT_ADDRESS = new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"); // e.g. USDC on Solana
+            // const TOKEN_MINT_ADDRESS = new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"); // e.g. USDC on Solana
+            const TOKEN_MINT_ADDRESS = new PublicKey("HwPtbFpd3VTe3tfyosoVtPf9WPuSk5gAKkN5xp6Npump"); // e.g. Token on Solana
 
             const amount = Number(swapAmount * 10 ** 8); // Convert to smallest unit (e.g., if 8 decimals)
 

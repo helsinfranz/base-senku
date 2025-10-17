@@ -32,7 +32,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Transaction already processed" }, { status: 409 });
     }
 
-    const SOLANA_RPC_URL = "https://api.devnet.solana.com";
+    const SOLANA_RPC_URL = "https://api.mainnet-beta.solana.com";
     const TREASURE_ADDRESS = "7ziZFc6zh2U1jxpYxzrA2HL77UZo8TLt9X65pNtW6EPp";
     const MINT_ADDRESS = "C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K";
 

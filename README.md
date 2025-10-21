@@ -19,7 +19,7 @@
 
 ## 📖 About
 
-Senku's Elixir is an innovative blockchain-based puzzle game that combines strategic thinking with Web3 mechanics. Players solve increasingly challenging tube puzzles while earning FLUOR tokens and collecting unique Blueprint NFTs.
+Senku's Elixir is an innovative blockchain-based puzzle game that combines strategic thinking with Web3 mechanics. Players solve increasingly challenging tube puzzles while earning FLUOR in-game tokens and collecting unique Blueprint NFTs.
 
 ## ✨ Features
 
@@ -36,7 +36,7 @@ Senku's Elixir is an innovative blockchain-based puzzle game that combines strat
 
 - Node.js 18+
 - PNPM package manager
-- MetaMask or any Web3 wallet
+- Phantom or any Web3 wallet
 
 ### Installation
 
@@ -95,7 +95,7 @@ Visit http://localhost:3000 to start playing!
 - **Type**: DEX Utility Token with swap utility
 - **Standard**: SPL
 - **Network**: Solana
-- **Address**: `Coming Soon`
+- **Address**: `Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai`
 - **Use Cases**:
   - Purchasing FLUOR from $MDS
   - Future ecosystem utility
@@ -103,49 +103,49 @@ Visit http://localhost:3000 to start playing!
 ### Token Purchase System
 
 Buy FLUOR from $MDS in buy section.
+
 - **Features**:
   - Conversion from MDS to FLUOR
   - 1:1 swap ratio
-  - No swap fees (only solana network gas)
   - One-click process
 
 ## 💎 Tokenomics
 
-### MDS Distribution
-
-- **Public Sale**: 37.5% - Available for public purchase and trading
-- **Liquidity Pool**: 12.5% - Reserved for DEX liquidity provision
-- **KOLs**: 10% - Amplify launch & shill
-- **Development Team**: 25% - Core development team allocation
-- **Airdrops**: 5% - Quests & community rewards
-- **DcodeBlock**: 10% - Support, infra & ops
+Refer Cyrene_AI for Tokenomics
 
 ## 🗺️ Roadmap
 
-### Q3 2025 - Economic Expansion
+### Q4 2025 - Economic Expansion
 
 - Launch of $MDS Token
 - $MDS to FLUOR Purchase System
 - Enhanced Gameplay Integration
 - New Level Additions
 
-### Q4 2025 - The Forge Creation
+### Q1 2026 - The Forge Creation
 
 - KOSB to Ranked NFT Conversion System
 - Legendary & Epic Tier NFT Minting
 - NFT Marketplace Integration
 
-### Q1 2026 - Competitive Ecosystem
+### Q2 2026 - Competitive Ecosystem
 
 - Global Leaderboard System
 - High-Ranking Player Rewards
-- FLUOR-Based DAO Governance
+- MDS-Based DAO Governance
 
-### Q2 2026 - ARC Seasons & Stone World
+### Q3 2026 - ARC Seasons & Stone World
 
 - Dr. Stone Storyline Integration
 - Multi-Difficulty Level Campaigns
 - Educational Material Cards System
+
+### Q4 2026 - Community Merketplace
+
+- In-Game Store System Launch
+- MDS Token Item Purchases
+- DAO-Governed Item Catalog
+- Premium Cosmetics & Utility Items
 
 ## 🛠 Built With
 
@@ -157,7 +157,7 @@ Buy FLUOR from $MDS in buy section.
 
 ## 📝 Smart Contracts
 
-All our smart contracts are deployed on the Base Sepolia Testnet and verified on Blockscout..
+All our smart contracts are deployed on the Base Sepolia Testnet, Solana and verified on-chain..
 
 ### FluoriteToken (FLUOR)
 
@@ -168,7 +168,8 @@ All our smart contracts are deployed on the Base Sepolia Testnet and verified on
 
 ### MedusaShardToken (MDS)
 
-- **Contract Address**: `Coming Soon`
+- **Contract Address**: `Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai`
+- [View on Solana Explorer](https://explorer.solana.com/address/Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai)
 - SPL utility token for Senku's Elixir.
 - Future ecosystem utility
 

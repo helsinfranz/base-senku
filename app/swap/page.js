@@ -23,6 +23,7 @@ import {
     getAssociatedTokenAddress,
     getAccount,
     createTransferInstruction,
+    TOKEN_2022_PROGRAM_ID
 } from "@solana/spl-token";
 
 export default function SwapPage() {
@@ -61,13 +62,11 @@ export default function SwapPage() {
         setIsLoadingBalance(true)
         try {
             // 1️⃣ Get associated token account for user
-            // const ata = await getAssociatedTokenAddress(new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"), new PublicKey(walletAddress));
-            const ata = await getAssociatedTokenAddress(new PublicKey("HwPtbFpd3VTe3tfyosoVtPf9WPuSk5gAKkN5xp6Npump"), new PublicKey(walletAddress));
-
+            const ata = await getAssociatedTokenAddress(new PublicKey("Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai"), new PublicKey(walletAddress), false, TOKEN_2022_PROGRAM_ID);
             // 2️⃣ Fetch token account info
-            const tokenAccount = await getAccount(connection, ata);
+            const tokenAccount = await getAccount(connection, ata, "confirmed", TOKEN_2022_PROGRAM_ID);
 
-            const decimals = 6;
+            const decimals = 9;
 
             const formattedBalance =
                 Number(tokenAccount.amount) / 10 ** decimals;
@@ -85,10 +84,9 @@ export default function SwapPage() {
         try {
             if (!solanaWallet.publicKey || !ethAddress) throw new Error("Reconnect Wallet");
             const TREASURY_WALLET = new PublicKey("uKQ77M8ee7Jq2TKoZSyUUWDbxv9Eva8rv8DZn2DVLXm"); // treasury wallet
-            // const TOKEN_MINT_ADDRESS = new PublicKey("C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K"); // e.g. USDC on Solana
-            const TOKEN_MINT_ADDRESS = new PublicKey("HwPtbFpd3VTe3tfyosoVtPf9WPuSk5gAKkN5xp6Npump"); // e.g. Token on Solana
+            const TOKEN_MINT_ADDRESS = new PublicKey("Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai"); // Token on Solana
 
-            const amount = Number(swapAmount * 10 ** 8); // Convert to smallest unit (e.g., if 8 decimals)
+            const amount = Number(swapAmount * 10 ** 9); // Convert to smallest unit (e.g., if 9 decimals)
 
             if (!solanaWallet.publicKey) throw new Error("Solana wallet not connected");
             if (isNaN(amount) || Number(amount) <= 0) throw new Error("Invalid buy amount");
@@ -98,12 +96,14 @@ export default function SwapPage() {
             // Get the associated token accounts for both wallets
             const userATA = await getAssociatedTokenAddress(
                 TOKEN_MINT_ADDRESS,
-                userWallet
+                userWallet,
+                false, TOKEN_2022_PROGRAM_ID
             );
 
             const treasuryATA = await getAssociatedTokenAddress(
                 TOKEN_MINT_ADDRESS,
-                TREASURY_WALLET
+                TREASURY_WALLET,
+                false, TOKEN_2022_PROGRAM_ID
             );
 
             // Create transfer instruction
@@ -111,7 +111,9 @@ export default function SwapPage() {
                 userATA,
                 treasuryATA,
                 userWallet,
-                amount
+                amount,
+                [],
+                TOKEN_2022_PROGRAM_ID
             );
 
             // Create transaction and add the transfer instruction
@@ -211,6 +213,23 @@ export default function SwapPage() {
                     <div className="text-center mb-8">
                         <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Buy FLUOR</h1>
                         <p className="text-gray-400 text-lg">Convert your Medusa Shards (MDS) to FLUOR</p>
+                    </div>
+
+                    {/* SPL Contract Address CTA */}
+                    <div className="mb-6 flex justify-center">
+                        <div className="w-full max-w-xl">
+                            <div className="bg-gradient-to-r from-emerald-900/30 to-green-900/30 rounded-lg p-4 border border-emerald-500/30 flex items-center justify-between">
+                                <div>
+                                    <div className="text-sm text-white font-semibold">$MDS CA</div>
+                                    <div className="text-gray-300 text-xs mt-1 font-mono break-all">Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai</div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <a href="https://cyreneai.com/preview-page?tokenAddress=Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai" target="_blank" rel="noopener noreferrer">
+                                        <Button className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg">Trade</Button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <Card className="bg-gray-900/60 backdrop-blur-md border border-gray-700/50">

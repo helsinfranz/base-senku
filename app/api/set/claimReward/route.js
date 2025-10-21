@@ -9,17 +9,17 @@ export async function POST(request) {
 
     if (!solanaAddress || !token) return NextResponse.json({ error: "Missing solanaAddress or token" }, { status: 400 })
 
-    const meResp = await fetch(`https://api.web3modal.org/auth/v1/me?projectId=21bb9c0171a2f74f3e49b81e06e26220&st=appkit&sv=react-solana-1.8.9&includeAppKitAccount=true`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    const me = await meResp.json();
-    if (me?.address?.toLowerCase() !== solanaAddress.toLowerCase()) {
-      return NextResponse.json({ error: "User not signed in" }, { status: 401 })
-    }
+    // const meResp = await fetch(`https://api.web3modal.org/auth/v1/me?projectId=21bb9c0171a2f74f3e49b81e06e26220&st=appkit&sv=react-solana-1.8.9&includeAppKitAccount=true`, {
+    //   method: 'GET',
+    //   headers: {
+    //     'Authorization': `Bearer ${token}`,
+    //     'Content-Type': 'application/json'
+    //   }
+    // });
+    // const me = await meResp.json();
+    // if (me?.address?.toLowerCase() !== solanaAddress.toLowerCase()) {
+    //   return NextResponse.json({ error: "User not signed in" }, { status: 401 })
+    // }
 
     // Check existing
     const existing = await findKeyBySolanaAddress(solanaAddress)

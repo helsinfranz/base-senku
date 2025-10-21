@@ -185,8 +185,37 @@ export default function HomePage() {
                       Connect your wallet to begin your scientific journey!
                     </p>
                   )}
+
+                  <p className="text-gray-300 text-sm mt-5">CA: <span className="text-green-300 font-mono break-all">Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai</span></p>
                 </CardContent>
               </Card>
+
+              {/* SPL Contract Address CTA */}
+              {/* <Card className="bg-gradient-to-r from-emerald-900/40 to-green-900/40 backdrop-blur-md border border-emerald-500/40 mb-8">
+                  <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between">
+                    <div className="mb-4 md:mb-0">
+                      <h4 className="text-lg font-bold text-white">SPL Token Contract</h4>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <a
+                        href="https://cyreneai.com/preview-page?tokenAddress=Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white font-semibold px-6 py-2 rounded-lg shadow-lg">
+                          Trade
+                        </Button>
+                      </a>
+                      <button
+                        className="text-gray-300 text-sm px-3 py-2 rounded-md border border-gray-700/40 hover:bg-gray-800/40"
+                        onClick={() => { navigator && navigator.clipboard && navigator.clipboard.writeText('Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai') }}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card> */}
             </div>
 
             {/* Right Side - Hero Image */}

@@ -9,6 +9,8 @@ import InitialTokensModal from "@/components/initial-tokens-modal"
 import RouteGuard from "@/components/route-guard"
 import { useWallet } from "@/contexts/wallet-context"
 import { useToast } from "@/components/toast"
+import { Button } from "@/components/ui/button"
+import { Dna } from "lucide-react"
 
 function GameArenaContent() {
   const {
@@ -401,7 +403,7 @@ function GameArenaContent() {
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3">
                   <button
                     onClick={() => {
                       const text =
@@ -425,6 +427,18 @@ function GameArenaContent() {
                   >
                     Close
                   </button> */}
+
+                  <Button
+                    onClick={handleUnlockNft}
+                    disabled={!canUnlockNft}
+                    className={`${canUnlockNft
+                      ? "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400"
+                      : "bg-gray-600/50"
+                      } text-white text-xs md:text-sm`}
+                  >
+                    <Dna className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                    Mint NFT
+                  </Button>
                 </div>
 
                 <p className="text-gray-400 text-xs mt-4">More levels coming soon!</p>
@@ -509,7 +523,7 @@ function GameArenaContent() {
               <button
                 onClick={handlePayToPlayCurrent}
                 disabled={fluorBalance < 1 || gameState.isPayingToPlay}
-                className={`w-full text-lg py-3 font-semibold rounded-lg transition-all duration-300 ${fluorBalance >= 1 && !gameState.isPayingToPlay
+                className={`w-full text-lg py-3 mb-4 font-semibold rounded-lg transition-all duration-300 ${fluorBalance >= 1 && !gameState.isPayingToPlay
                   ? "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white"
                   : "bg-gray-600/50 text-gray-400 cursor-not-allowed"
                   }`}
@@ -520,6 +534,18 @@ function GameArenaContent() {
                     ? "Pay & Start Level"
                     : "Insufficient FLUOR"}
               </button>
+
+              <Button
+                onClick={handleUnlockNft}
+                disabled={!canUnlockNft}
+                className={`${canUnlockNft
+                  ? "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400"
+                  : "bg-gray-600/50"
+                  } text-white text-xs md:text-sm`}
+              >
+                <Dna className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                Mint NFT
+              </Button>
 
               {fluorBalance < 1 && !canClaimReward && (
                 <p className="text-red-400 text-sm mt-4">

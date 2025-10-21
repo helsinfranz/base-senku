@@ -32,9 +32,9 @@ export async function POST(request) {
       return NextResponse.json({ error: "Transaction already processed" }, { status: 409 });
     }
 
-    const SOLANA_RPC_URL = "https://api.devnet.solana.com";
-    const TREASURE_ADDRESS = "7ziZFc6zh2U1jxpYxzrA2HL77UZo8TLt9X65pNtW6EPp";
-    const MINT_ADDRESS = "C5hkCo3nE6F9K6z67tzridUnbNGXfs8HBxxanFzCm58K";
+    const SOLANA_RPC_URL = "https://api.mainnet-beta.solana.com";
+    const TREASURE_ADDRESS = "91QcDikPgwVCUMmxBqu61vXnhrs9DqE7VHSiNbvSwS4M";
+    const MINT_ADDRESS = "Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai";
 
     const conn = new Connection(SOLANA_RPC_URL, "finalized");
     const parsedTx = await conn.getParsedTransaction(txHash, "finalized");
@@ -117,7 +117,7 @@ export async function POST(request) {
     const token = new ethers.Contract(ERC20_CONTRACT_ADDRESS, FLUORITE_TOKEN_ABI, wallet);
 
     const tokenDecimals = 18;
-    const amountToSend = ethers.parseUnits(String(amount / 10 ** 8), tokenDecimals);
+    const amountToSend = ethers.parseUnits(String(amount / 10 ** 9), tokenDecimals);
 
     let txResponse;
     try {

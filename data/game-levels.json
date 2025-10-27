@@ -4727,19 +4727,19 @@
           { "color": "#F0E68C", "id": 6 }
         ],
         [
-          { "color": "#F0E68C", "id": 9 },
+          { "color": "#A2F093", "id": 9 },
           { "color": "#7B68EE", "id": 10 },
           { "color": "#6A5ACD", "id": 11 },
           { "color": "#7B68EE", "id": 10 }
         ],
         [
           { "color": "#7B68EE", "id": 10 },
-          { "color": "#F0E68C", "id": 9 },
+          { "color": "#A2F093", "id": 9 },
           { "color": "#6A5ACD", "id": 11 },
-          { "color": "#F0E68C", "id": 9 }
+          { "color": "#A2F093", "id": 9 }
         ],
         [
-          { "color": "#F0E68C", "id": 9 },
+          { "color": "#A2F093", "id": 9 },
           { "color": "#7B68EE", "id": 10 },
           { "color": "#6A5ACD", "id": 11 },
           { "color": "#6A5ACD", "id": 11 }
@@ -5007,8 +5007,8 @@
         [
           { "color": "#FF6347", "id": 1 },
           { "color": "#4682B4", "id": 2 },
-          { "color": "#32CD32", "id": 14 },
-          { "color": "#32CD32", "id": 14 }
+          { "color": "#F67477", "id": 14 },
+          { "color": "#F67477", "id": 14 }
         ],
         [
           { "color": "#FF1493", "id": 13 },
@@ -5047,10 +5047,10 @@
           { "color": "#FF1493", "id": 13 }
         ],
         [
-          { "color": "#32CD32", "id": 14 },
+          { "color": "#F67477", "id": 14 },
           { "color": "#B0C4DE", "id": 3 },
           { "color": "#DDA0DD", "id": 4 },
-          { "color": "#32CD32", "id": 14 }
+          { "color": "#F67477", "id": 14 }
         ],
         [],
         []

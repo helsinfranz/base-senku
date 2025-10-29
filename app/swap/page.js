@@ -17,14 +17,16 @@ import { useAppKitProvider } from '@reown/appkit/react'
 import { useAppKitConnection } from '@reown/appkit-adapter-solana/react'
 import {
     PublicKey,
-    Transaction,
 } from "@solana/web3.js";
 import {
     getAssociatedTokenAddress,
     getAccount,
-    createTransferInstruction,
     TOKEN_2022_PROGRAM_ID
 } from "@solana/spl-token";
+
+// x402
+
+import { createX402Client } from '@payai/x402-solana/client';
 
 export default function SwapPage() {
     const solanaWallet = useAppKitProvider('solana').walletProvider
@@ -83,92 +85,33 @@ export default function SwapPage() {
 
         try {
             if (!solanaWallet.publicKey || !ethAddress) throw new Error("Reconnect Wallet");
-            const TREASURY_WALLET = new PublicKey("uKQ77M8ee7Jq2TKoZSyUUWDbxv9Eva8rv8DZn2DVLXm"); // treasury wallet
-            const TOKEN_MINT_ADDRESS = new PublicKey("Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai"); // Token on Solana
 
-            const amount = Number(swapAmount * 10 ** 9); // Convert to smallest unit (e.g., if 9 decimals)
-
-            if (!solanaWallet.publicKey) throw new Error("Solana wallet not connected");
-            if (isNaN(amount) || Number(amount) <= 0) throw new Error("Invalid buy amount");
-
+            const amount = Number(swapAmount * 10 ** 9);
             const userWallet = solanaWallet.publicKey;
 
-            // Get the associated token accounts for both wallets
-            const userATA = await getAssociatedTokenAddress(
-                TOKEN_MINT_ADDRESS,
-                userWallet,
-                false, TOKEN_2022_PROGRAM_ID
-            );
+            // Create x402 client
+            const client = createX402Client({
+                wallet: solanaWallet,
+                network: 'solana',
+                rpcUrl: "https://mainnet.helius-rpc.com/?api-key=59d15393-1c14-4115-b919-76b0ba1b6361",
+                maxPaymentAmount: BigInt(1_000_000_000_000_000), // 100,000 USDC in micro-units
+            });
 
-            const treasuryATA = await getAssociatedTokenAddress(
-                TOKEN_MINT_ADDRESS,
-                TREASURY_WALLET,
-                false, TOKEN_2022_PROGRAM_ID
-            );
-
-            // Create transfer instruction
-            const transferInstruction = createTransferInstruction(
-                userATA,
-                treasuryATA,
-                userWallet,
-                amount,
-                [],
-                TOKEN_2022_PROGRAM_ID
-            );
-
-            // Create transaction and add the transfer instruction
-            const transaction = new Transaction().add(transferInstruction);
-
-            transaction.feePayer = userWallet;
-            transaction.recentBlockhash = (await connection.getLatestBlockhash('confirmed')).blockhash
-
-            if (!transaction || !solanaWallet.signTransaction) {
-                throw new Error("Failed to create transaction or wallet cannot sign");
-            }
-
-            const signature = await solanaWallet.sendTransaction(transaction, connection);
-            await connection.confirmTransaction(signature, 'finalized');
-
-            // // Sign the transaction
-            // const signedTransaction = await solanaWallet.signTransaction(
-            //     transaction
-            // );
-
-            // // Send and confirm the transaction
-            // const signature = await connection.sendRawTransaction(
-            //     signedTransaction.serialize()
-            // );
-
-            console.log("Transaction successful with signature:", signature);
-            setTxHash(signature)
-
-            toast.success("MDS transfer submitted! Processing swap...")
-            setIsProcessing(true)
-            await loadMdsBalance() // Refresh MDS balance
-
-            // Call backend API to credit FLUOR
-            const response = await fetch("/api/payment/swap", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            // Make a paid request - automatically handles 402 payments
+            const response = await client.fetch('/api/payment/swap', {
+                method: 'POST',
                 body: JSON.stringify({
                     playerAddress: ethAddress,
                     userWallet: userWallet.toString(),
                     amount: amount,
-                    txHash: signature,
                 }),
-            })
+            });
 
-            const data = await response.json()
-
-            if (!data.success) {
-                throw new Error(data.message || "Swap API call failed")
-            }
+            const result = await response.json();
 
             toast.success(`Successfully swapped ${swapAmount} MDS for ${swapAmount} FLUOR!`)
             setSwapAmount("")
-            setTxHash(data.txHash || "")
+            setTxHash(result?.txHash || "")
             await loadPlayerData(true) // Refresh FLUOR balance
             await loadMdsBalance() // Refresh MDS balance
         } catch (error) {
@@ -224,7 +167,7 @@ export default function SwapPage() {
                                     <div className="text-gray-300 text-xs mt-1 font-mono break-all">Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai</div>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <a href="https://cyreneai.com/preview-page?tokenAddress=Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai" target="_blank" rel="noopener noreferrer">
+                                    <a href="https://jup.ag/?sell=So11111111111111111111111111111111111111112&buy=Dria68ScNfmRrvL7K1nx5cEkND6V6V5yUGkFr7gcyai" target="_blank" rel="noopener noreferrer">
                                         <Button className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg">Trade</Button>
                                     </a>
                                 </div>
@@ -357,7 +300,7 @@ export default function SwapPage() {
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-gray-400">Network Fee:</span>
-                                            <span className="text-gray-400">{"<$0.01 (Gas)"}</span>
+                                            <span className="text-gray-400">{"$0.00 (Free)"}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -406,6 +349,7 @@ export default function SwapPage() {
                                     <li>• Sign the transaction in your wallet</li>
                                     <li>• MDS tokens will be converted to FLUOR at a 1:1 rate</li>
                                     <li>• Use FLUOR to enhance your gaming experience</li>
+                                    <li>• Powered by X402</li>
                                 </ul>
                             </div>
                         </CardContent>

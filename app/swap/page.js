@@ -300,7 +300,7 @@ export default function SwapPage() {
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-gray-400">Network Fee:</span>
-                                            <span className="text-gray-400">{"<$0.01 (Gas)"}</span>
+                                            <span className="text-gray-400">{"$0.00 (Free)"}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -349,6 +349,7 @@ export default function SwapPage() {
                                     <li>• Sign the transaction in your wallet</li>
                                     <li>• MDS tokens will be converted to FLUOR at a 1:1 rate</li>
                                     <li>• Use FLUOR to enhance your gaming experience</li>
+                                    <li>• Powered by X402</li>
                                 </ul>
                             </div>
                         </CardContent>
